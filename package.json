@@ -24,6 +24,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "superjson": "1.12.2",
+    "undici": "^5.22.1",
     "zod": "^3.21.4"
   },
   "devDependencies": {
