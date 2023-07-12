@@ -6,7 +6,11 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "migrations:generate": "drizzle-kit generate:mysql",
+    "migrations:push": "node -r esbuild-register src/db/migrate.ts",
+    "db:push": "drizzle-kit push:mysql",
+    "migrations:drop": "drizzle-kit drop --config=drizzle.config.ts"
   },
   "dependencies": {
     "@planetscale/database": "^1.8.0",
