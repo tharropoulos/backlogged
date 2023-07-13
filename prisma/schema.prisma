@@ -23,18 +23,19 @@ model Example {
 }
 
 model Game {
-    id               String      @id @default(cuid())
-    name             String      @db.VarChar(191)
-    description      String      @db.VarChar(191)
-    cover_image      String      @db.VarChar(191)
-    background_image String      @db.VarChar(191)
-    release_date     DateTime    @default(now())
+    id               String           @id @default(cuid())
+    name             String           @db.VarChar(191)
+    description      String           @db.VarChar(191)
+    cover_image      String           @db.VarChar(191)
+    background_image String           @db.VarChar(191)
+    release_date     DateTime         @default(now())
     franchiseId      String
-    franchise        Franchise   @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+    franchise        Franchise        @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
     publisherId      String
-    publisher        Publisher   @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+    publisher        Publisher        @relation(fields: [publisherId], references: [id], onDelete: Cascade)
     developers       Developer[]
     genres           Genre[]
+    platforms        GameToPlatform[]
 
     @@index([publisherId])
     @@index([franchiseId])
@@ -46,6 +47,27 @@ model Publisher {
     description String @db.VarChar(191)
     cover_image String @db.VarChar(191)
     games       Game[]
+}
+
+model Platform {
+    id          String           @id @default(cuid())
+    name        String           @db.VarChar(191)
+    description String           @db.VarChar(191)
+    cover_image String           @db.VarChar(191)
+    games       GameToPlatform[]
+}
+
+// The reason I added this model is because I wanted to add an online store link to the game for each platform
+model GameToPlatform {
+    id         Int      @id @default(autoincrement()) // Int is lighter on rights than cuid
+    gameId     String
+    platformId String
+    game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+    platform   Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+    store_link String   @db.VarChar(191)
+
+    @@index([gameId])
+    @@index([platformId])
 }
 
 model Developer {
