@@ -9,7 +9,7 @@ generator client {
 datasource db {
     provider     = "mysql"
     relationMode = "prisma"
-
+    shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
     // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
