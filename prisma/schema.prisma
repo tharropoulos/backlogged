@@ -30,7 +30,7 @@ model Game {
     background_image String      @db.VarChar(191)
     release_date     DateTime    @default(now())
     franchiseId      String
-    franchise        Francise    @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+    franchise        Franchise   @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
     publisherId      String
     publisher        Publisher   @relation(fields: [publisherId], references: [id], onDelete: Cascade)
     developers       Developer[]
@@ -55,7 +55,7 @@ model Developer {
     games       Game[]
 }
 
-model Francise {
+model Franchise {
     id               String @id @default(cuid())
     name             String @db.VarChar(191)
     description      String @db.VarChar(191)
