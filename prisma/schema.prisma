@@ -29,7 +29,7 @@ model Game {
     description      String   @db.VarChar(191)
     cover_image      String   @db.VarChar(191)
     background_image String   @db.VarChar(191)
-    release_date     DateTime @default(now()) @db.DateTime
+    release_date     DateTime @default(now())
 }
 
 // Necessary for Next auth
