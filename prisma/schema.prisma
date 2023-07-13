@@ -23,16 +23,27 @@ model Example {
 }
 
 model Game {
-    id               String   @id @default(cuid())
-    name             String   @db.VarChar(191)
-    description      String   @db.VarChar(191)
-    cover_image      String   @db.VarChar(191)
-    background_image String   @db.VarChar(191)
-    release_date     DateTime @default(now())
+    id               String    @id @default(cuid())
+    name             String    @db.VarChar(191)
+    description      String    @db.VarChar(191)
+    cover_image      String    @db.VarChar(191)
+    background_image String    @db.VarChar(191)
+    release_date     DateTime  @default(now())
     franchiseId      String
-    franchise        Francise @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+    franchise        Francise  @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+    publisherId      String
+    publisher        Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
 
+    @@index([publisherId])
     @@index([franchiseId])
+}
+
+model Publisher {
+    id          String @id @default(cuid())
+    name        String @db.VarChar(191)
+    description String @db.VarChar(191)
+    cover_image String @db.VarChar(191)
+    games       Game[]
 }
 
 model Francise {
