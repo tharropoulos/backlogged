@@ -34,6 +34,7 @@ model Game {
     publisherId      String
     publisher        Publisher   @relation(fields: [publisherId], references: [id], onDelete: Cascade)
     developers       Developer[]
+    genres           Genre[]
 
     @@index([publisherId])
     @@index([franchiseId])
@@ -52,6 +53,13 @@ model Developer {
     name        String @db.VarChar(191)
     description String @db.VarChar(191)
     cover_image String @db.VarChar(191)
+    games       Game[]
+}
+
+model Genre {
+    id          String @id @default(cuid())
+    name        String @db.VarChar(191)
+    description String @db.VarChar(191)
     games       Game[]
 }
 
