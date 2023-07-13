@@ -30,6 +30,18 @@ model Game {
     cover_image      String   @db.VarChar(191)
     background_image String   @db.VarChar(191)
     release_date     DateTime @default(now())
+    franchiseId      String
+    franchise        Francise @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+
+    @@index([franchiseId])
+}
+
+model Francise {
+    id               String @id @default(cuid())
+    name             String @db.VarChar(191)
+    description      String @db.VarChar(191)
+    background_image String @db.VarChar(191)
+    games            Game[]
 }
 
 // Necessary for Next auth
