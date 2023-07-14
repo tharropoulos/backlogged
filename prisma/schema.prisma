@@ -43,6 +43,19 @@ model Game {
     @@index([franchiseId])
 }
 
+model ReviewLike {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    reviewId  String
+    review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([reviewId])
+    @@index([userId])
+}
+
 model CommentLike {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
@@ -76,16 +89,17 @@ model Comment {
 }
 
 model Review {
-    id        String    @id @default(cuid())
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
+    id        String       @id @default(cuid())
+    createdAt DateTime     @default(now())
+    updatedAt DateTime     @updatedAt
     gameId    String
-    game      Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+    game      Game         @relation(fields: [gameId], references: [id], onDelete: Cascade)
     userId    String
-    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
     rating    Int?
-    content   String    @db.Text
+    content   String       @db.Text
     comments  Comment[]
+    likes     ReviewLike[]
 
     @@index([gameId])
     @@index([userId])
@@ -192,6 +206,7 @@ model User {
     reviews       Review[]
     commments     Comment[]
     comment_likes CommentLike[]
+    review_likes  ReviewLike[]
 }
 
 model VerificationToken {
