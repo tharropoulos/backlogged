@@ -38,6 +38,7 @@ model Game {
     platforms        GameToPlatform[]
     features         Feature[]
     reviews          Review[]
+    playlists        Playlist[]
 
     @@index([publisherId])
     @@index([franchiseId])
@@ -209,6 +210,39 @@ model User {
     review_likes  ReviewLike[]
     followers     Follows[]     @relation("following")
     following     Follows[]     @relation("follower")
+    playlists     Playlist[]
+}
+
+model Playlist {
+    id          String             @id @default(cuid())
+    name        String             @db.VarChar(191)
+    description String?            @db.VarChar(191)
+    type        PlaylistType
+    userId      String
+    user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    games       Game[]
+    createdAt   DateTime           @default(now())
+    updatedAt   DateTime           @updatedAt
+    deletedAt   DateTime?
+    deleted     Boolean            @default(false)
+    visibility  PlaylistVisibility
+
+    @@index([userId])
+}
+
+enum PlaylistVisibility {
+    PUBLIC
+    PRIVATE
+    FOLLOWERS_ONLY
+}
+
+enum PlaylistType {
+    BACKLOG
+    LIKED
+    COMPLETED
+    PLAYING
+    DROPPED
+    CUSTOM
 }
 
 model Follows {
