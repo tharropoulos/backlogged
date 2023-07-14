@@ -207,6 +207,19 @@ model User {
     commments     Comment[]
     comment_likes CommentLike[]
     review_likes  ReviewLike[]
+    followers     Follows[]     @relation("following")
+    following     Follows[]     @relation("follower")
+}
+
+model Follows {
+    id          String @id @default(cuid())
+    follower    User   @relation("follower", fields: [followerId], references: [id])
+    followerId  String
+    followingId String
+    following   User   @relation("following", fields: [followingId], references: [id])
+
+    @@index([followerId])
+    @@index([followingId])
 }
 
 model VerificationToken {
