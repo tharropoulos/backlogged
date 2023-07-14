@@ -36,6 +36,7 @@ model Game {
     developers       Developer[]
     genres           Genre[]
     platforms        GameToPlatform[]
+    features         Feature[]
 
     @@index([publisherId])
     @@index([franchiseId])
@@ -49,9 +50,17 @@ model Publisher {
     games       Game[]
 }
 
+model Feature {
+    id          String @id @default(cuid())
+    name        String @db.VarChar(191)
+    description String @db.VarChar(191)
+    cover_image String @db.VarChar(191)
+    games       Game[]
+}
+
 model Platform {
     id          String           @id @default(cuid())
-    name        String           @db.VarChar(191)
+    name        String           @db.VarChar(192)
     description String           @db.VarChar(191)
     cover_image String           @db.VarChar(191)
     games       GameToPlatform[]
