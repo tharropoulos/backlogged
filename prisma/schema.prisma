@@ -37,9 +37,25 @@ model Game {
     genres           Genre[]
     platforms        GameToPlatform[]
     features         Feature[]
+    reviews          Review[]
 
     @@index([publisherId])
     @@index([franchiseId])
+}
+
+model Review {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    gameId    String
+    game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    rating    Int?
+    content   String   @db.Text
+
+    @@index([gameId])
+    @@index([userId])
 }
 
 model Publisher {
@@ -140,6 +156,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    reviews       Review[]
 }
 
 model VerificationToken {
