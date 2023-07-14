@@ -43,18 +43,32 @@ model Game {
     @@index([franchiseId])
 }
 
-model Comment {
-    id        String    @id @default(cuid())
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    reviewId  String
-    review    Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+model CommentLike {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    commentId String
+    comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
     userId    String
-    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    content   String    @db.Text
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([commentId])
+    @@index([userId])
+}
+
+model Comment {
+    id        String        @id @default(cuid())
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+    reviewId  String
+    review    Review        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+    userId    String
+    user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    content   String        @db.Text
     parentId  String?
-    parent    Comment?  @relation("CommentToComment", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-    children  Comment[] @relation("CommentToComment")
+    parent    Comment?      @relation("CommentToComment", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    children  Comment[]     @relation("CommentToComment")
+    likes     CommentLike[]
 
     @@index([reviewId])
     @@index([parentId])
@@ -168,15 +182,16 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String        @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?       @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
     reviews       Review[]
     commments     Comment[]
+    comment_likes CommentLike[]
 }
 
 model VerificationToken {
