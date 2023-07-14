@@ -43,16 +43,35 @@ model Game {
     @@index([franchiseId])
 }
 
-model Review {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    gameId    String
-    game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+model Comment {
+    id        String    @id @default(cuid())
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    reviewId  String
+    review    Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
     userId    String
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    content   String    @db.Text
+    parentId  String?
+    parent    Comment?  @relation("CommentToComment", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    children  Comment[] @relation("CommentToComment")
+
+    @@index([reviewId])
+    @@index([parentId])
+    @@index([userId])
+}
+
+model Review {
+    id        String    @id @default(cuid())
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    gameId    String
+    game      Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+    userId    String
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     rating    Int?
-    content   String   @db.Text
+    content   String    @db.Text
+    comments  Comment[]
 
     @@index([gameId])
     @@index([userId])
@@ -157,6 +176,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     reviews       Review[]
+    commments     Comment[]
 }
 
 model VerificationToken {
