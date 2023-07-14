@@ -197,20 +197,21 @@ model Session {
 }
 
 model User {
-    id            String        @id @default(cuid())
-    name          String?
-    email         String?       @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    reviews       Review[]
-    commments     Comment[]
-    comment_likes CommentLike[]
-    review_likes  ReviewLike[]
-    followers     Follows[]     @relation("following")
-    following     Follows[]     @relation("follower")
-    playlists     Playlist[]
+    id             String         @id @default(cuid())
+    name           String?
+    email          String?        @unique
+    emailVerified  DateTime?
+    image          String?
+    accounts       Account[]
+    sessions       Session[]
+    reviews        Review[]
+    commments      Comment[]
+    comment_likes  CommentLike[]
+    review_likes   ReviewLike[]
+    followers      Follows[]      @relation("following")
+    following      Follows[]      @relation("follower")
+    playlists      Playlist[]
+    playlist_likes PlaylistLike[]
 }
 
 model Playlist {
@@ -226,7 +227,21 @@ model Playlist {
     deletedAt   DateTime?
     deleted     Boolean            @default(false)
     visibility  PlaylistVisibility
+    likes       PlaylistLike[]
 
+    @@index([userId])
+}
+
+model PlaylistLike {
+    id         String   @id @default(cuid())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    playlistId String
+    playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+    userId     String
+    user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([playlistId])
     @@index([userId])
 }
 
