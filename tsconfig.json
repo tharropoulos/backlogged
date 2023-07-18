@@ -19,7 +19,8 @@
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
