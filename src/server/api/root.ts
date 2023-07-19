@@ -1,4 +1,3 @@
-import { exampleRouter } from "./routers/example";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { franchiseRouter } from "./routers/franchise";
 
