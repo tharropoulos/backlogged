@@ -22,7 +22,6 @@ jobs:
         volumes:
           - db-data:./mysql/var/lib/mysql
       volumes:
-        tests:
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NODE_ENV: "test"
