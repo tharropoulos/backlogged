@@ -29,6 +29,13 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Docker Compose Action
+        uses: isbang/compose-action@v1.4.1
+        with:
+          compose-file: "./docker-compose.yml"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Test
         run: npm run test
 
