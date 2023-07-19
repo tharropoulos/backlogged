@@ -45,7 +45,7 @@ jobs:
 
       - name: Create test database
         run: |
-          mysql -u ${{ secrets.MYSQL_USER}} -p${{ secrets.ROOT_PASSWORD }} -e "CREATE DATABASE tests;"
+          mysql -u ${{ secrets.MYSQL_USER}} -pprisma -e "CREATE DATABASE tests;"
 
       - name: Test
         run: npm run test:ci
