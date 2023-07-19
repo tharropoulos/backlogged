@@ -12,7 +12,7 @@ jobs:
     services:
       db:
         image: mysql:8.0
-        environment:
+        env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
