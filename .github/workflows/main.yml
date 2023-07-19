@@ -43,10 +43,6 @@ jobs:
       - name: Start MySQL service
         run: sudo /etc/init.d/mysql start
 
-      - name: Create test database
-        run: |
-          mysql -u user -pprisma -e "CREATE DATABASE tests;"
-
       - name: Test
         run: npm run test:ci
 
