@@ -9,18 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      db:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        ports:
-          - 3306:3306
-        volumes:
-          - ./mysql/var/lib/mysql
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NODE_ENV: "test"
@@ -39,9 +27,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Test
-        run: npm run test:ci
 
       - name: Test
         run: npm run test:ci
