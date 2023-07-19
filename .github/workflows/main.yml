@@ -40,6 +40,22 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Start MySQL service
+        run: sudo /etc/init.d/mysql start
+
+      - name: Create test database
+        run: |
+          mysql -u ${{ secrets.MYSQL_USER}} -p${{ secrets.ROOT_PASSWORD }} -e "CREATE DATABASE tests;"
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Stop MySQL service
+        run: sudo /etc/init.d/mysql stop
+
+      - run: |
+          sudo /etc/init.d/mysql start
+
       - name: Test
         run: npm run test:ci
 
