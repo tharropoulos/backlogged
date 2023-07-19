@@ -16,12 +16,6 @@ datasource db {
     url               = env("DATABASE_URL")
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
 model Game {
     id               String           @id @default(cuid())
     name             String           @db.VarChar(191)
