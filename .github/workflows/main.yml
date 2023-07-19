@@ -40,14 +40,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Start MySQL service
-        run: sudo /etc/init.d/mysql start
-
       - name: Test
         run: npm run test:ci
-
-      - name: Stop MySQL service
-        run: sudo /etc/init.d/mysql stop
 
       - name: Test
         run: npm run test:ci
