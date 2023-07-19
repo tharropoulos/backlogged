@@ -19,6 +19,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      db:
+        image: mysql:8.0
+        restart: always
+        container_name: intergration-tests-prisma
+        ports:
+          - 3306:3306
+        environment:
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        expose:
+          - 3306
+        volumes:
+          - ./mysql:/var/lib/mysql
+    volumes:
+      tests:
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -29,15 +48,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Docker Compose Action
-        uses: isbang/compose-action@v1.4.1
-        with:
-          compose-file: "./docker-compose.yml"
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
       - name: Test
-        run: npm run test
+        run: npm run test:ci
 
       - name: Docker Compose Down
         run: docker-compose down
