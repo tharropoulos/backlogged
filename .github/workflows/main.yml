@@ -1,0 +1,33 @@
+name: Build, Test, and Lint
+
+on:
+  push:
+    branches:
+      - prisma
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Unit Test
+        run: npm run test
+
+      - name: Integration Test
+        run: npm run test:i
+
+      - name: Docker Compose Down
+        run: docker-compose down
+
+      - name: Lint
+        run: npm run lint
