@@ -20,7 +20,7 @@ jobs:
         ports:
           - 3306:3306
         volumes:
-          - db-data:./mysql/var/lib/mysql
+          - ./mysql:/var/lib/mysql
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NODE_ENV: "test"
