@@ -10,12 +10,12 @@ beforeAll(async () => {
       {
         name: "franchise1",
         description: "franchise1",
-        background_image: "franchise1",
+        backgroundImage: "franchise1",
       },
       {
         name: "franchise2",
         description: "franchise2",
-        background_image: "franchise2",
+        backgroundImage: "franchise2",
       },
     ],
   });
@@ -38,7 +38,7 @@ describe("When creating a franchise", () => {
       const franchise = {
         name: "franchise3",
         description: "franchise3",
-        background_image: "franchise3",
+        backgroundImage: "franchise3",
       };
 
       const caller = appRouter.createCaller({
@@ -58,7 +58,7 @@ describe("When creating a franchise", () => {
       const franchise = {
         name: "franchise3",
         description: "franchise3",
-        background_image: "franchise3",
+        backgroundImage: "franchise3",
       };
       const user: User = {
         id: "1",
@@ -114,7 +114,7 @@ describe("When getting a franchise by Id", () => {
         data: {
           name: "franchise4",
           description: "franchise4",
-          background_image: "franchise4",
+          backgroundImage: "franchise4",
         },
       });
 
@@ -157,12 +157,12 @@ describe("When getting all franchises", () => {
         {
           name: "franchise5",
           description: "franchise5",
-          background_image: "franchise5",
+          backgroundImage: "franchise5",
         },
         {
           name: "franchise6",
           description: "franchise6",
-          background_image: "franchise6",
+          backgroundImage: "franchise6",
         },
       ];
 
@@ -198,7 +198,7 @@ describe("When updating a franchise", () => {
         id: "1",
         name: "franchise7",
         description: "franchise7",
-        background_image: "franchise7",
+        backgroundImage: "franchise7",
       });
 
       // Assert
@@ -232,7 +232,7 @@ describe("When updating a franchise", () => {
         id: "1",
         name: "franchise7",
         description: "franchise7",
-        background_image: "franchise7",
+        backgroundImage: "franchise7",
       });
 
       // Assert
@@ -247,7 +247,7 @@ describe("When updating a franchise", () => {
         data: {
           name: "franchise8",
           description: "franchise8",
-          background_image: "franchise8",
+          backgroundImage: "franchise8",
         },
       });
 
@@ -274,7 +274,7 @@ describe("When updating a franchise", () => {
         id: data.id,
         name: "updated",
         description: "updated",
-        background_image: "updated",
+        backgroundImage: "updated",
       });
 
       // Assert
@@ -282,7 +282,7 @@ describe("When updating a franchise", () => {
         id: data.id,
         name: "updated",
         description: "updated",
-        background_image: "updated",
+        backgroundImage: "updated",
       });
     });
   });
@@ -339,7 +339,7 @@ describe("When deleting a franchise", () => {
         data: {
           name: "franchise9",
           description: "franchise9",
-          background_image: "franchise9",
+          backgroundImage: "franchise9",
         },
       });
 

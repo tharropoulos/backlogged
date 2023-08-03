@@ -65,7 +65,7 @@ export const franchiseRouter = createTRPCRouter({
       z.object({
         name: z.string().min(1).max(255),
         description: z.string().min(1).max(255),
-        background_image: z.string().min(1).max(255),
+        backgroundImage: z.string().min(1).max(255),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -73,7 +73,7 @@ export const franchiseRouter = createTRPCRouter({
         data: {
           name: input.name,
           description: input.description,
-          background_image: input.background_image,
+          backgroundImage: input.backgroundImage,
         },
       });
       console.log(franchise);
@@ -86,7 +86,7 @@ export const franchiseRouter = createTRPCRouter({
         id: z.string(),
         name: z.string().min(1).max(255),
         description: z.string().min(1).max(255),
-        background_image: z.string().min(1).max(255),
+        backgroundImage: z.string().min(1).max(255),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -107,7 +107,7 @@ export const franchiseRouter = createTRPCRouter({
         data: {
           name: input.name,
           description: input.description,
-          background_image: input.background_image,
+          backgroundImage: input.backgroundImage,
         },
         where: {
           id: input.id,

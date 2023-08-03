@@ -35,7 +35,7 @@ describe("When creating a franchise", () => {
         caller.franchise.create({
           name: "Test Franchise 1",
           description: "This is a test franchise 1",
-          background_image: "test1.jpg",
+          backgroundImage: "test1.jpg",
         })
       ).rejects.toThrow();
     });
@@ -52,7 +52,7 @@ describe("When creating a franchise", () => {
         id: "test",
         name: "Test Franchise 1",
         description: "This is a test franchise 1",
-        background_image: "test1.jpg",
+        backgroundImage: "test1.jpg",
       };
       mockCtx.prisma.franchise.create.mockResolvedValue(expectedCreated);
 
@@ -66,7 +66,7 @@ describe("When creating a franchise", () => {
         data: {
           name: expectedCreated.name,
           description: expectedCreated.description,
-          background_image: expectedCreated.background_image,
+          backgroundImage: expectedCreated.backgroundImage,
         },
       });
     });
@@ -102,13 +102,13 @@ describe("When retrieving all franchises", () => {
           id: "1",
           name: "Test Franchise 1",
           description: "This is a test franchise 1",
-          background_image: "test1.jpg",
+          backgroundImage: "test1.jpg",
         },
         {
           id: "2",
           name: "Test Franchise 2",
           description: "This is a test franchise 2",
-          background_image: "test2.jpg",
+          backgroundImage: "test2.jpg",
           games: [
             {
               id: "1",
@@ -117,8 +117,8 @@ describe("When retrieving all franchises", () => {
               background_image: "game1.jpg",
               franchiseId: "2",
               publisherId: "1",
-              cover_image: "game1.jpg",
-              release_date: new Date(),
+              coverImage: "game1.jpg",
+              releaseDate: new Date(),
             },
           ],
         },
@@ -202,7 +202,7 @@ describe("When updating a franchise", () => {
           id: "test",
           name: "Test Franchise 1",
           description: "This is a test franchise 1",
-          background_image: "test1.jpg",
+          backgroundImage: "test1.jpg",
         })
       ).rejects.toThrow();
     });
@@ -223,7 +223,7 @@ describe("When updating a franchise", () => {
           id: "notfound",
           name: "Test Franchise 1",
           description: "This is a test franchise 1",
-          background_image: "test1.jpg",
+          backgroundImage: "test1.jpg",
         })
       ).rejects.toThrow();
     });
@@ -236,14 +236,14 @@ describe("When updating a franchise", () => {
         id: "test",
         name: "Test Franchise 1",
         description: "This is a test franchise 1",
-        background_image: "test1.jpg",
+        backgroundImage: "test1.jpg",
       };
       mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
       const expectedUpdated = {
         id: "test",
         name: "UPDATED",
         description: "UPDATED",
-        background_image: "test1.jpg",
+        backgroundImage: "test1.jpg",
       };
       mockCtx.prisma.franchise.update.mockResolvedValue(expectedUpdated);
 
@@ -262,7 +262,7 @@ describe("When updating a franchise", () => {
         data: {
           name: expectedUpdated.name,
           description: expectedUpdated.description,
-          background_image: expectedUpdated.background_image,
+          background_image: expectedUpdated.backgroundImage,
         },
         where: {
           id: franchise.id,
