@@ -8,8 +8,10 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SiteHeader />
-      <main className="mt-8">{children}</main>
+      <div className="flex min-h-screen flex-col">
+        <SiteHeader />
+        <main className="flex flex-grow">{children}</main>
+      </div>
     </ThemeProvider>
   );
 }
