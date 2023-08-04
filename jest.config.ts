@@ -13,6 +13,5 @@ export default {
   transform: {
     "^.+\\.mjs$": "ts-jest",
     "^.+\\.tsx?$": ["ts-jest", { tsconfig: "./tsconfig.test.json" }],
-    "^.+\\.tsx?$": ["ts-jest", { tsconfig: "./tsconfig.test.json" }],
   },
 };
