@@ -1,5 +1,5 @@
 import { appRouter } from "~/server/api/root";
-import { createMockContext, type MockContext } from "../../context";
+import { createMockContext, type MockContext } from "~/server/api/context";
 import type { Session } from "next-auth";
 
 let mockCtx: MockContext;
@@ -163,7 +163,7 @@ describe("When retrieving a franchise by Id", () => {
         id: "test",
         name: "Test Franchise 1",
         description: "This is a test franchise 1",
-        background_image: "test1.jpg",
+        backgroundImage: "test1.jpg",
       };
       mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
 
@@ -262,7 +262,7 @@ describe("When updating a franchise", () => {
         data: {
           name: expectedUpdated.name,
           description: expectedUpdated.description,
-          background_image: expectedUpdated.backgroundImage,
+          backgroundImage: expectedUpdated.backgroundImage,
         },
         where: {
           id: franchise.id,
@@ -315,14 +315,14 @@ describe("When deleting a franchise", () => {
         id: "test",
         name: "Test Franchise 1",
         description: "This is a test franchise 1",
-        background_image: "test1.jpg",
+        backgroundImage: "test1.jpg",
       };
       mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
       const expectedDeleted = {
         id: "test",
         name: "Test Franchise 1",
         description: "This is a test franchise 1",
-        background_image: "test1.jpg",
+        backgroundImage: "test1.jpg",
       };
       mockCtx.prisma.franchise.delete.mockResolvedValue(expectedDeleted);
 
