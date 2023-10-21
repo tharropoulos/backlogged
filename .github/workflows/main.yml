@@ -44,10 +44,13 @@ jobs:
         with:
           mysql version: 8.0
           mysql root password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          mysql database: ${{ secrets.MYSQL_DATABASE }}
 
       - name: Start MySQL service
         run: sudo service mysql start
+
+      - name: Create test database
+        run: |
+          mysql --user=${{ secrets.MYSQL_USER}} --password=${{ secrets.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE tests;"
 
       - name: Install dependencies
         run: npm install
