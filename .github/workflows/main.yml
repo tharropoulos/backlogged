@@ -49,10 +49,6 @@ jobs:
       - name: Start MySQL service
         run: sudo service mysql start
 
-      - name: Wait for MySQL
-        run: |
-          sleep 20
-
       - name: Install dependencies
         run: npm install
 
