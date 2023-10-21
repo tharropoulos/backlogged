@@ -10,19 +10,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     # services:
-      # db:
-      #   image: mysql:8.0
-      #   env:
-      #     MYSQL_ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
-      #     MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-      #     MYSQL_USER: ${{ secrets.MYSQL_USER }}
-      #     MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-      #   ports:
-      #     - 3306:3306
-      #   volumes:
-      #     - ./mysql/var/lib/mysql
-      #   restart: always
+    # db:
+    #   image: mysql:8.0
+    #   env:
+    #     MYSQL_ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+    #     MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+    #     MYSQL_USER: ${{ secrets.MYSQL_USER }}
+    #     MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+    #   ports:
+    #     - 3306:3306
+    #   volumes:
+    #     - ./mysql/var/lib/mysql
+    #   restart: always
     env:
+      MYSQL_ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NODE_ENV: "test"
       NEXTAUTH_SECRET: ${{secrets.NEXTAUTH_SECRET}}
