@@ -9,6 +9,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      # db:
+      #   image: mysql:8.0
+      #   env:
+      #     MYSQL_ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+      #     MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+      #     MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      #     MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      #   ports:
+      #     - 3306:3306
+      #   volumes:
+      #     - ./mysql/var/lib/mysql
+      #   restart: always
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NODE_ENV: "test"
@@ -22,11 +35,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: 8.0
+          mysql root-password: ${{ secrets.ROOT_PASSWORD }}
+          mysql database: ${{ secrets.MYSQL_DATABASE }}
+          mysql user: ${{ secrets.MYSQL_USER }}
+          mysql password: ${{ secrets.MYSQL_PASSWORD }}
+
+      - name: Start MySQL service
+        run: sudo service mysql start
+
+      - name: Wait for MySQL
+        run: |
+          sleep 20
+
+      - name: Create test database
+        run: |
+          mysql -u ${{ secrets.MYSQL_USER}} -p${{ secrets.ROOT_PASSWORD }} -e "CREATE DATABASE tests;"
+
       - name: Install dependencies
         run: npm install
 
       - name: Build
         run: npm run build
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Stop MySQL service
+        run: sudo /etc/init.d/mysql stop
+
+      - run: |
+          sudo /etc/init.d/mysql start
 
       - name: Test
         run: npm run test:ci
