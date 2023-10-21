@@ -6,6 +6,8 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
+import { createFranchiseSchema } from "~/lib/validations/franchise";
+
 export const franchiseRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const res = await ctx.prisma.franchise.findMany();
@@ -61,13 +63,7 @@ export const franchiseRouter = createTRPCRouter({
       }
     }),
   create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().min(1).max(255),
-        description: z.string().min(1).max(255),
-        backgroundImage: z.string().min(1).max(255),
-      })
-    )
+    .input(createFranchiseSchema)
     .mutation(async ({ ctx, input }) => {
       const franchise = await ctx.prisma.franchise.create({
         data: {
