@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
+    # services:
       # db:
       #   image: mysql:8.0
       #   env:
