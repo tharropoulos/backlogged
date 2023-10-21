@@ -43,10 +43,8 @@ jobs:
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql version: 8.0
-          mysql root-password: ${{ secrets.ROOT_PASSWORD }}
+          mysql root password: ${{ secrets.ROOT_PASSWORD }}
           mysql database: ${{ secrets.MYSQL_DATABASE }}
-          mysql user: ${{ secrets.MYSQL_USER }}
-          mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
       - name: Start MySQL service
         run: sudo service mysql start
@@ -54,10 +52,6 @@ jobs:
       - name: Wait for MySQL
         run: |
           sleep 20
-
-      - name: Create test database
-        run: |
-          mysql -u ${{ secrets.MYSQL_USER}} -p ${{ secrets.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE tests;"
 
       - name: Install dependencies
         run: npm install
@@ -69,13 +63,7 @@ jobs:
         run: npm run test:ci
 
       - name: Stop MySQL service
-        run: sudo /etc/init.d/mysql stop
-
-      - run: |
-          sudo /etc/init.d/mysql start
-
-      - name: Test
-        run: npm run test:ci
+        run: sudo service mysql stop
 
       - name: Lint
         run: npm run lint
