@@ -57,7 +57,7 @@ jobs:
 
       - name: Create test database
         run: |
-          mysql -u ${{ secrets.MYSQL_USER}} -p${{ secrets.ROOT_PASSWORD }} -e "CREATE DATABASE tests;"
+          mysql -u ${{ secrets.MYSQL_USER}} -p ${{ secrets.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE tests;"
 
       - name: Install dependencies
         run: npm install
