@@ -9,24 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # services:
-    # db:
-    #   image: mysql:8.0
-    #   env:
-    #     MYSQL_ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
-    #     MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-    #     MYSQL_USER: ${{ secrets.MYSQL_USER }}
-    #     MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-    #   ports:
-    #     - 3306:3306
-    #   volumes:
-    #     - ./mysql/var/lib/mysql
-    #   restart: always
     env:
-      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-      MYSQL_USER: ${{ secrets.MYSQL_USER }}
-      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NODE_ENV: "test"
       NEXTAUTH_SECRET: ${{secrets.NEXTAUTH_SECRET}}
@@ -39,17 +22,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql version: 8.0
-          mysql user: ${{ secrets.MYSQL_USER }}
-          mysql password: ${{ secrets.MYSQL_PASSWORD }}
-          mysql database: ${{ secrets.MYSQL_DATABASE }}
-
-      - name: Start MySQL service
-        run: sudo service mysql start
-
       - name: Install dependencies
         run: npm install
 
@@ -58,9 +30,6 @@ jobs:
 
       - name: Test
         run: npm run test:ci
-
-      - name: Stop MySQL service
-        run: sudo service mysql stop
 
       - name: Lint
         run: npm run lint
