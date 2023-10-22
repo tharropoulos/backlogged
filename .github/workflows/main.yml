@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - prisma
+      - copilot-testing
       - main
 
 jobs:
