@@ -1,5 +1,6 @@
 // NOTE: Written by Copilot Chat
 import { appRouter } from "~/server/api/root";
+import { createId } from "@paralleldrive/cuid2";
 import type { z } from "zod";
 import { createMockContext, type MockContext } from "~/server/api/context";
 import type { Session } from "next-auth";
@@ -258,7 +259,7 @@ describe("When updating a publisher", () => {
     it("should update the publisher", async () => {
       // Arrange
       const publisher: PublisherSchema = {
-        id: "test",
+        id: createId(),
         name: "Test Publisher 1",
         description: "This is a test publisher 1",
         // logo: "test1.jpg", //ERROR: Same as line 40
@@ -266,7 +267,7 @@ describe("When updating a publisher", () => {
       };
       mockCtx.prisma.publisher.findUnique.mockResolvedValue(publisher);
       const expectedUpdated: PublisherSchema = {
-        id: "test",
+        id: publisher.id,
         name: "Test Publisher 1",
         description: "This is a test publisher 1",
         // logo: "test1.jpg", //ERROR: Same as line 40
