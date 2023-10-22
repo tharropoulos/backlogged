@@ -11,12 +11,12 @@ export const createPublisherSchema = z.object({
 });
 
 export const publisherSchema = createPublisherSchema.extend({
-  id: z.string().cuid(),
+  id: z.string().cuid2(),
   // NOTE: Copilot generated this, with no input from me
   games: z
     .array(
       z.object({
-        id: z.string().cuid(),
+        id: z.string().cuid2(),
         name: z.string().min(1).max(255),
         description: z.string().min(1).max(255),
         releaseDate: z.date(),
