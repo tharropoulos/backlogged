@@ -180,7 +180,7 @@ describe("When retrieving a publisher by Id", () => {
     });
   });
   describe("and the publisher is found", () => {
-    it("should return the publisher", () => {
+    it("should return the publisher", async () => {
       // Arrange
       const publisher: PublisherSchema = {
         id: "test",
@@ -197,7 +197,7 @@ describe("When retrieving a publisher by Id", () => {
       });
 
       // Act
-      const result = caller.publisher.getById({ id: publisher.id });
+      const result = await caller.publisher.getById({ id: publisher.id });
 
       // Assert
       expect(result).toMatchObject(publisher);
