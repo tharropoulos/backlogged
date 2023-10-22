@@ -9,7 +9,10 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
-import { createPublisherSchema } from "~/lib/validations/publisher";
+import {
+  createPublisherSchema,
+  publisherSchema,
+} from "~/lib/validations/publisher";
 
 // import { create } from "domain"; // Uneeded import, Copilot nonsense
 
@@ -95,7 +98,7 @@ export const publisherRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(z.object({ id: z.string(), data: createPublisherSchema }))
+    .input(publisherSchema) //Copilot deviated from my implementation
     .mutation(async ({ ctx, input }) => {
       const instance = await ctx.prisma.publisher.findUnique({
         where: {
@@ -115,13 +118,13 @@ export const publisherRouter = createTRPCRouter({
             id: input.id,
           },
           data: {
-            name: input.data.name,
-            coverImage: input.data.coverImage,
-            description: input.data.description,
+            //ERROR: Copilot used input.data instead of input
+            name: input.name,
+            coverImage: input.coverImage,
+            description: input.description,
             // country: input.data.country, // Copilot nonsense
           },
         });
-        console.log(res);
         return res;
       } catch (err) {
         throw new TRPCError({
