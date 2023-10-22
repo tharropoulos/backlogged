@@ -157,7 +157,7 @@ describe("When retrieving a franchise by Id", () => {
     });
   });
   describe("and the franchise is found", () => {
-    it("should return the franchise", async () => {
+    it("should return the franchise", () => {
       // Arrange
       const franchise = {
         id: "test",
@@ -173,7 +173,7 @@ describe("When retrieving a franchise by Id", () => {
       });
 
       // Act
-      const result = await caller.franchise.getById({ id: franchise.id });
+      const result = caller.franchise.getById({ id: franchise.id });
 
       // Assert
       expect(result).toMatchObject(franchise);
