@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-await-sync-query */
 // NOTE: Written by Copilot Chat
 import { appRouter } from "~/server/api/root";
 import { createId } from "@paralleldrive/cuid2";

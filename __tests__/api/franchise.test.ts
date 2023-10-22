@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-await-sync-query  */ // false positive
 import { appRouter } from "~/server/api/root";
 import { createMockContext, type MockContext } from "~/server/api/context";
 import type { Session } from "next-auth";

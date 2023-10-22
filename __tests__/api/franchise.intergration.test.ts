@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-await-sync-query */
 import type { User } from "@prisma/client";
 import type { Session } from "next-auth";
 import { appRouter } from "~/server/api/root";
