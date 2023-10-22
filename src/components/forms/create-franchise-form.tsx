@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Skeleton } from "../ui/skeleton";
 import { useTransition } from "react";
-import { z } from "zod";
+import type { z } from "zod";
 import { Icons } from "../icons";
 import { useForm } from "react-hook-form";
 import { toast, Toaster } from "sonner";
