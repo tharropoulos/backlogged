@@ -665,7 +665,7 @@ describe("When adding games to a developer", () => {
           });
 
           const result = await caller.developer.getGames({ id: developer.id });
-          const prismaResult = await prisma.game.findMany({
+          const gamesResult = await prisma.game.findMany({
             where: {
               id: { in: games.map((g) => g.id) },
             },
@@ -678,12 +678,14 @@ describe("When adding games to a developer", () => {
             },
           });
 
+          const expectedGames: { developers: { id: string }[] }[] = [];
+          games.forEach(() => {
+            expectedGames.push({ developers: [{ id: developer.id }] });
+          });
+
           //Assert
           expect(result).toMatchObject({ games: games });
-          expect(prismaResult).toMatchObject([
-            { developers: [{ id: developer.id }] },
-            { developers: [{ id: developer.id }] },
-          ]);
+          expect(gamesResult).toMatchObject(expectedGames);
         });
       });
     });
@@ -1034,12 +1036,13 @@ describe("When removing games from a developer", () => {
           },
         });
 
+        const expectedGames: { developers: { id: string }[] }[] = [];
+        games.forEach(() => {
+          expectedGames.push({ developers: [] });
+        });
         //Assert
         expect(developerResult).toMatchObject(expectedUpdated);
-        expect(gamesResult).toMatchObject([
-          { developers: [] },
-          { developers: [] },
-        ]);
+        expect(gamesResult).toMatchObject(expectedGames);
       });
     });
   });
