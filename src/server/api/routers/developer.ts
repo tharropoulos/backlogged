@@ -15,7 +15,6 @@ import {
 export const developerRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const res = await ctx.prisma.developer.findMany();
-    console.log(res);
     return res;
   }),
 
@@ -34,7 +33,6 @@ export const developerRouter = createTRPCRouter({
           message: "Developer not found",
         });
       }
-      console.log(res);
       return res;
     }),
 
@@ -59,7 +57,6 @@ export const developerRouter = createTRPCRouter({
             id: input.id,
           },
         });
-        console.log(res);
         return res;
       } catch (err) {
         //How do i test this?
@@ -80,7 +77,6 @@ export const developerRouter = createTRPCRouter({
           coverImage: input.coverImage,
         },
       });
-      console.log(developer);
       return developer;
     }),
 
@@ -112,7 +108,6 @@ export const developerRouter = createTRPCRouter({
             coverImage: input.coverImage,
           },
         });
-        console.log(developer);
         return developer;
       } catch (err) {
         throw new TRPCError({
@@ -148,7 +143,6 @@ export const developerRouter = createTRPCRouter({
         });
       }
 
-      console.log(res);
       return res;
     }),
 

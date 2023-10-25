@@ -11,7 +11,6 @@ import { createFranchiseSchema } from "~/lib/validations/franchise";
 export const franchiseRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const res = await ctx.prisma.franchise.findMany();
-    console.log(res);
     return res;
   }),
 
@@ -30,7 +29,6 @@ export const franchiseRouter = createTRPCRouter({
           message: "Franchise not found",
         });
       }
-      console.log(res);
       return res;
     }),
 
@@ -55,10 +53,8 @@ export const franchiseRouter = createTRPCRouter({
             id: input.id,
           },
         });
-        console.log(res);
         return res;
       } catch (err) {
-        console.error(err);
         throw err;
       }
     }),
@@ -72,7 +68,6 @@ export const franchiseRouter = createTRPCRouter({
           backgroundImage: input.backgroundImage,
         },
       });
-      console.log(franchise);
       return franchise;
     }),
 

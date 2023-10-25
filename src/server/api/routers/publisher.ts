@@ -19,7 +19,6 @@ import {
 export const publisherRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const res = await ctx.prisma.publisher.findMany();
-    console.log(res);
     return res;
   }),
 
@@ -38,7 +37,6 @@ export const publisherRouter = createTRPCRouter({
           message: "Publisher not found",
         });
       }
-      console.log(res);
       return res;
     }),
 
@@ -63,7 +61,6 @@ export const publisherRouter = createTRPCRouter({
             id: input.id,
           },
         });
-        console.log(res);
         return res;
       } catch (err) {
         throw new TRPCError({
@@ -87,7 +84,6 @@ export const publisherRouter = createTRPCRouter({
             // country: input.country, // Copilot nonsense
           },
         });
-        console.log(res);
         return res;
       } catch (err) {
         throw new TRPCError({
