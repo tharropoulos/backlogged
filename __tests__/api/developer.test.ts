@@ -234,7 +234,6 @@ describe("When retrieving a developer by id", () => {
         //Act
         // eslint-disable-next-line testing-library/no-await-sync-query
         const result = await caller.developer.getGames({ id: developer.id });
-        console.log(result); //Unexpected behavior, returns the developer with the games, not just the games
         expect(result).toMatchObject(developer);
       });
     });
@@ -479,6 +478,7 @@ describe("When adding games to a developer", () => {
             description: "Test Description",
             name: "Test Developer",
             id: createId(),
+            games: [],
           };
           mockCtx.prisma.developer.findUnique.mockResolvedValue(developer);
 
@@ -530,8 +530,6 @@ describe("When adding games to a developer", () => {
 
           //Assert
           expect(result).toMatchObject(expectedUpdated);
-          console.log("ADD GAMES RESULT");
-          console.log(result);
           expect(mockCtx.prisma.developer.update).toHaveBeenCalledWith({
             data: {
               games: {
@@ -620,36 +618,38 @@ describe("When removing games from a developer", () => {
       describe("and the games exist", () => {
         it("should remove the games from the developer", async () => {
           //Arrange
+          const games = [
+            {
+              id: createId(),
+              name: "Test Game",
+              description: "Test Description",
+              releaseDate: new Date(),
+              coverImage: "Test Cover Image",
+              backgroundImage: "Test Background Image",
+              publisherId: createId(),
+              franchiseId: createId(),
+            },
+            {
+              id: createId(),
+              name: "Test Game 2",
+              description: "Test Description 2",
+              releaseDate: new Date(),
+              coverImage: "Test Cover Image 2 ",
+              backgroundImage: "Test Background Image 2",
+              publisherId: createId(),
+              franchiseId: createId(),
+            },
+          ];
           const developer: Developer = {
             coverImage: "Test Cover Image",
             description: "Test Description",
             name: "Test Developer",
             id: createId(),
-            games: [
-              {
-                id: createId(),
-                name: "Test Game",
-                description: "Test Description",
-                releaseDate: new Date(),
-                coverImage: "Test Cover Image",
-                backgroundImage: "Test Background Image",
-                publisherId: createId(),
-                franchiseId: createId(),
-              },
-              {
-                id: createId(),
-                name: "Test Game 2",
-                description: "Test Description 2",
-                releaseDate: new Date(),
-                coverImage: "Test Cover Image 2 ",
-                backgroundImage: "Test Background Image 2",
-                publisherId: createId(),
-                franchiseId: createId(),
-              },
-            ],
+            games: games,
           };
 
           mockCtx.prisma.developer.findUnique.mockResolvedValue(developer);
+          mockCtx.prisma.game.findMany.mockResolvedValue(games);
 
           const expectedUpdated: Developer = {
             id: developer.id,
