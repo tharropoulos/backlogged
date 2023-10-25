@@ -112,7 +112,6 @@ model Feature {
     id          String @id @default(cuid())
     name        String @db.VarChar(191)
     description String @db.VarChar(191)
-    coverImage  String @map("cover_image") @db.VarChar(191)
     games       Game[]
 }
 
