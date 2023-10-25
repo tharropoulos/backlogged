@@ -9,9 +9,11 @@ import type {
   developerSchema,
 } from "~/lib/validations/developer";
 import { createId } from "@paralleldrive/cuid2";
+import type { gameSchema } from "~/lib/validations/game";
 
 type CreateDeveloper = z.infer<typeof createDeveloperSchema>;
 type Developer = z.infer<typeof developerSchema>;
+type Game = z.infer<typeof gameSchema>;
 const initDevelopers: CreateDeveloper[] = [
   {
     name: "developer1",
@@ -517,7 +519,7 @@ describe("When adding games to a developer", () => {
         });
 
         //Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrowError("Game not found");
       });
     });
 
@@ -632,27 +634,20 @@ describe("When adding games to a developer", () => {
           const franchises = await prisma.franchise.findMany();
           const publishers = await prisma.publisher.findMany();
 
-          const game1 = await prisma.game.create({
-            data: {
-              backgroundImage: "game1",
-              coverImage: "game1",
-              description: "game1",
-              name: "game1",
-              publisherId: publishers[0]?.id ?? createId(),
-              franchiseId: franchises[0]?.id ?? createId(),
-            },
-          });
-          const game2 = await prisma.game.create({
-            data: {
-              backgroundImage: "game2",
-              coverImage: "game2",
-              description: "game2",
-              name: "game2",
-              publisherId: publishers[1]?.id ?? createId(),
-              franchiseId: franchises[1]?.id ?? createId(),
-            },
-          });
-
+          const games: Game[] = [];
+          for (let i = 0; i < 2; i++) {
+            const game = await prisma.game.create({
+              data: {
+                backgroundImage: `game${i + 1}`,
+                coverImage: `game${i + 1}`,
+                description: `game${i + 1}`,
+                name: `game${i + 1}`,
+                publisherId: publishers[i]?.id ?? createId(),
+                franchiseId: franchises[i]?.id ?? createId(),
+              },
+            });
+            games.push(game);
+          }
           const mockSession: Session = {
             expires: new Date().toISOString(),
             user: user,
@@ -666,24 +661,29 @@ describe("When adding games to a developer", () => {
           //Act
           await caller.developer.addGames({
             id: developer.id,
-            gameIds: [game1.id, game2.id],
+            gameIds: games.map((g) => g.id),
           });
 
           const result = await caller.developer.getGames({ id: developer.id });
           const prismaResult = await prisma.game.findMany({
             where: {
-              id: { in: [game1.id, game2.id] },
+              id: { in: games.map((g) => g.id) },
             },
             select: {
-              developers: true,
+              developers: {
+                select: {
+                  id: true,
+                },
+              },
             },
           });
 
           //Assert
-          expect(result).toMatchObject({ games: [game1, game2] });
-          expect(prismaResult).toMatchObject({
-            developers: [{ id: developer.id }],
-          });
+          expect(result).toMatchObject({ games: games });
+          expect(prismaResult).toMatchObject([
+            { developers: [{ id: developer.id }] },
+            { developers: [{ id: developer.id }] },
+          ]);
         });
       });
     });
@@ -777,7 +777,6 @@ describe("When removing games from a developer", () => {
             name: "developer6",
           },
         });
-        console.log("developer id: ", developer.id);
 
         const mockSession: Session = {
           expires: new Date().toISOString(),
@@ -982,36 +981,25 @@ describe("When removing games from a developer", () => {
         const franchises = await prisma.franchise.findMany();
         const publishers = await prisma.publisher.findMany();
 
-        const game1 = await prisma.game.create({
-          data: {
-            backgroundImage: "game1",
-            coverImage: "game1",
-            developers: {
-              connect: {
-                id: developer.id,
+        const games: Game[] = [];
+        for (let i = 0; i <= 1; i++) {
+          const game = await prisma.game.create({
+            data: {
+              backgroundImage: `game${i + 1}`,
+              coverImage: `game${i + 1}`,
+              description: `game${i + 1}`,
+              developers: {
+                connect: {
+                  id: developer.id,
+                },
               },
+              name: `game${i + 1}`,
+              publisherId: publishers[i]?.id ?? createId(),
+              franchiseId: franchises[i]?.id ?? createId(),
             },
-            description: "game1",
-            name: "game1",
-            publisherId: publishers[0]?.id ?? createId(),
-            franchiseId: franchises[0]?.id ?? createId(),
-          },
-        });
-        const game2 = await prisma.game.create({
-          data: {
-            backgroundImage: "game2",
-            coverImage: "game2",
-            developers: {
-              connect: {
-                id: developer.id,
-              },
-            },
-            description: "game2",
-            name: "game2",
-            publisherId: publishers[1]?.id ?? createId(),
-            franchiseId: franchises[1]?.id ?? createId(),
-          },
-        });
+          });
+          games.push(game);
+        }
 
         const mockSession: Session = {
           expires: new Date().toISOString(),
@@ -1026,12 +1014,12 @@ describe("When removing games from a developer", () => {
         //Act
         await caller.developer.removeGames({
           id: developer.id,
-          gameIds: [game1.id, game2.id],
+          gameIds: games.map((g) => g.id),
         });
 
         const gamesResult = await prisma.game.findMany({
           where: {
-            id: { in: [game1.id, game2.id] },
+            id: { in: games.map((g) => g.id) },
           },
           select: {
             developers: true,
