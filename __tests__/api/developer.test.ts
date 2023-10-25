@@ -10,11 +10,13 @@ import type {
   createDeveloperSchema,
   developerSchema,
 } from "~/lib/validations/developer";
+import type { gameSchema } from "~/lib/validations/game";
 
 let mockCtx: MockContext;
 
 type CreateDeveloper = z.infer<typeof createDeveloperSchema>;
 type Developer = z.infer<typeof developerSchema>;
+type Game = z.infer<typeof gameSchema>;
 
 beforeEach(() => {
   mockCtx = createMockContext();
@@ -618,7 +620,7 @@ describe("When removing games from a developer", () => {
       describe("and the games exist", () => {
         it("should remove the games from the developer", async () => {
           //Arrange
-          const games = [
+          const games: Game[] = [
             {
               id: createId(),
               name: "Test Game",
