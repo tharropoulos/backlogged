@@ -11,7 +11,6 @@ import type {
 } from "~/lib/validations/publisher";
 import { createId } from "@paralleldrive/cuid2";
 
-type Publisher = z.infer<typeof publisherSchema>;
 type CreatePublisher = z.infer<typeof createPublisherSchema>;
 
 beforeAll(async () => {
