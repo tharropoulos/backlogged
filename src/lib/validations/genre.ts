@@ -10,6 +10,6 @@ export const createGenreSchema = z.object({
 });
 
 export const genreSchema = createGenreSchema.extend({
-  id: z.string().cuid(),
+  id: z.string().cuid2(),
   games: z.array(gameSchema).optional(),
 });
