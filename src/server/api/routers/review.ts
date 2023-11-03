@@ -1,69 +1,99 @@
-import { createRouter } from "@trpc/server";
-
-import { PrismaClient } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 //NOTE: Written by Copilot
 
-export const reviewRouter = createRouter()
-  .mutation("create", {
-    input: z.object({
-      gameId: z.string(),
-      userId: z.string(),
-      rating: z.number().optional(),
-      content: z.string(),
+export const reviewRouter = createTRPCRouter({
+  create: protectedProcedure
+    .input(
+      z.object({
+        gameId: z.string(),
+        userId: z.string(),
+        rating: z.number().optional(),
+        content: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const res = await ctx.prisma.review.create({
+        data: input,
+      });
+      return res;
     }),
-    resolve: async ({ input }) => {
-      return prisma.review.create({ data: input });
-    },
-  })
-  .query("find", {
-    input: z.object({
-      id: z.string(),
+
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const res = await ctx.prisma.review.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (!res) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Review not found",
+        });
+      }
+
+      return res;
     }),
-    resolve: async ({ input }) => {
-      return prisma.review.findUnique({ where: { id: input.id } });
-    },
-  })
-  .query("findAll", {
-    resolve: async () => {
-      return prisma.review.findMany();
-    },
-  })
-  .mutation("update", {
-    input: z.object({
-      id: z.string(),
-      rating: z.number().optional(),
-      content: z.string().optional(),
+
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    const res = await ctx.prisma.review.findMany();
+    return res;
+  }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        rating: z.number().optional(),
+        content: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const res = await ctx.prisma.review.update({
+        where: { id: input.id },
+        data: input,
+      });
+      return res;
     }),
-    resolve: async ({ input }) => {
-      return prisma.review.update({ where: { id: input.id }, data: input });
-    },
-  })
-  .mutation("delete", {
-    input: z.object({
-      id: z.string(),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const res = await ctx.prisma.review.delete({
+        where: { id: input.id },
+      });
+      return res;
     }),
-    resolve: async ({ input }) => {
-      return prisma.review.delete({ where: { id: input.id } });
-    },
-  })
-  .mutation("like", {
-    input: z.object({
-      reviewId: z.string(),
-      userId: z.string(),
+
+  like: protectedProcedure
+    .input(
+      z.object({
+        reviewId: z.string(),
+        userId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const res = await ctx.prisma.reviewLike.create({
+        data: input,
+      });
+      return res;
     }),
-    resolve: async ({ input }) => {
-      return prisma.reviewLike.create({ data: input });
-    },
-  })
-  .mutation("unlike", {
-    input: z.object({
-      id: z.string(),
+
+  unlike: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const res = await ctx.prisma.reviewLike.delete({
+        where: { id: input.id },
+      });
+      return res;
     }),
-    resolve: async ({ input }) => {
-      return prisma.reviewLike.delete({ where: { id: input.id } });
-    },
-  });
+});
