@@ -42,13 +42,14 @@ model ReviewLike {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    reviewId  String
-    review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-    userId    String
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    reviewId  String @unique
+    review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade) 
+    userId    String @unique
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
 
     @@index([reviewId])
     @@index([userId])
+    @@unique([userId, reviewId])
 }
 
 model CommentLike {
@@ -62,6 +63,7 @@ model CommentLike {
 
     @@index([commentId])
     @@index([userId])
+    @@unique([userId, commentId])
 }
 
 model Comment {
@@ -94,7 +96,7 @@ model Review {
     rating    Int?
     content   String       @db.Text
     comments  Comment[]
-    likes     ReviewLike[]
+    likes     ReviewLike[] 
 
     @@index([gameId])
     @@index([userId])
@@ -134,6 +136,7 @@ model GameToPlatform {
 
     @@index([gameId])
     @@index([platformId])
+    @@unique([gameId, platformId])
 }
 
 model Developer {
