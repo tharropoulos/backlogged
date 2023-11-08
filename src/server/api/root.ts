@@ -6,6 +6,7 @@ import { featureRouter } from "./routers/feature";
 import { genreRouter } from "./routers/genre";
 import { platformRouter } from "./routers/platform";
 import { gameRouter } from "./routers/game";
+import { commentRouter } from "./routers/comment";
 import { reviewRouter } from "./routers/review";
 
 /**
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
   platform: platformRouter,
   game: gameRouter,
   review: reviewRouter,
+  comment: commentRouter,
 });
 
 // export type definition of API
