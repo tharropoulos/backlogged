@@ -5,10 +5,10 @@ export const createReviewSchema = z.object({
   gameId: z.string().cuid2(),
   rating: z.number().min(1).max(5).nullable(),
   content: z.string().min(1).max(5000),
-  userId: z.string().cuid2(),
 });
 
 export const reviewSchema = createReviewSchema.extend({
+  userId: z.string().cuid2(),
   id: z.string().cuid2(),
   likes: z
     .array(
