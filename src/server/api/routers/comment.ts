@@ -167,13 +167,9 @@ export const commentRouter = createTRPCRouter({
           },
           data: {
             likes: {
-              delete: [
-                {
-                  user: {
-                    connect: { id: ctx.session.user.id },
-                  },
-                },
-              ],
+              deleteMany: {
+                userId: ctx.session.user.id,
+              },
             },
           },
         })
