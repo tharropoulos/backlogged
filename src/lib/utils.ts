@@ -1,8 +1,27 @@
 import { TRPCError } from "@trpc/server";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Prisma } from "@prisma/client";
-import { Err } from "ts-results";
+import {
+  Prisma,
+  type Publisher,
+  type Game,
+  type Franchise,
+  type User,
+  Review,
+} from "@prisma/client";
+import { type Option, Err, None, Some } from "ts-results";
+import { type createPublisherSchema } from "./validations/publisher";
+import { type createGameSchema } from "./validations/game";
+import { type createFranchiseSchema } from "./validations/franchise";
+import { type createReviewSchema } from "./validations/review";
+import { faker } from "@faker-js/faker";
+import { type createUserSchema } from "./validations/user";
+import { type z } from "zod";
+import { createId } from "@paralleldrive/cuid2";
+import { prisma } from "~/server/db";
+import { appRouter } from "~/server/api/root";
+import { Session } from "next-auth";
+import { userAgent } from "next/server";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -66,4 +85,133 @@ export function handlePrismaError(err: unknown): Err<TRPCError> {
       })
     );
   }
+}
+async function createPublisher(
+  data: z.infer<typeof createPublisherSchema>
+): Promise<Publisher> {
+  return await prisma.publisher.create({ data: data });
+}
+
+async function createFranchise(
+  data: z.infer<typeof createFranchiseSchema>
+): Promise<Franchise> {
+  return await prisma.franchise.create({ data: data });
+}
+
+async function createGame(
+  data: z.infer<typeof createGameSchema>
+): Promise<Game> {
+  return await prisma.game.create({ data: data });
+}
+
+async function createUser(
+  data: z.infer<typeof createUserSchema>
+): Promise<User> {
+  return await prisma.user.create({ data: data });
+}
+
+async function createReview(
+  data: z.infer<typeof createReviewSchema> & { userId: string }
+): Promise<Review> {
+  return await prisma.review.create({ data: data });
+}
+//NOTE: Copilot suggestion
+type PromiseType<T> = T extends Promise<infer U> ? U : never;
+
+type TestDataOptions = {
+  publisher?: boolean;
+  franchise?: boolean;
+  game?: boolean;
+  review?: boolean;
+  user?: boolean;
+};
+
+export async function createTestData(options: TestDataOptions) {
+  const data: {
+    publisher: Option<PromiseType<ReturnType<typeof createPublisher>>>;
+    franchise: Option<PromiseType<ReturnType<typeof createFranchise>>>;
+    game: Option<PromiseType<ReturnType<typeof createGame>>>;
+    user: Option<PromiseType<ReturnType<typeof createUser>>>;
+    review: Option<PromiseType<ReturnType<typeof createReview>>>;
+  } = {
+    publisher: None,
+    franchise: None,
+    game: None,
+    user: None,
+    review: None,
+  };
+
+  if (options.publisher || options.game || options.review) {
+    data.publisher = new Some(
+      await createPublisher({
+        coverImage: faker.image.url(),
+        description: faker.lorem.words(),
+        name: faker.company.name(),
+      })
+    );
+  }
+
+  if (options.publisher || options.game || options.review) {
+    data.franchise = new Some(
+      await createFranchise({
+        name: faker.company.name(),
+        description: faker.lorem.words(),
+        backgroundImage: faker.image.url(),
+      })
+    );
+  }
+
+  if (options.game || options.review) {
+    data.game = new Some(
+      await createGame({
+        name: faker.commerce.productName(),
+        coverImage: faker.image.url(),
+        backgroundImage: faker.image.url(),
+        description: faker.lorem.words(),
+        franchiseId: data.franchise.unwrap().id,
+        publisherId: data.publisher.unwrap().id,
+        releaseDate: faker.date.past(),
+      })
+    );
+  }
+
+  if (options.user || options.review) {
+    data.user = new Some(
+      await createUser({
+        name: faker.person.firstName(),
+        email: faker.internet.email(),
+        emailVerified: faker.date.past(),
+        image: faker.image.avatar(),
+      })
+    );
+  }
+
+  if (options.review) {
+    data.review = new Some(
+      await createReview({
+        rating: faker.number.int({ min: 1, max: 5 }),
+        content: faker.lorem.paragraph(),
+        gameId: data.game.unwrap().id,
+        userId: data.user.unwrap().id,
+      })
+    );
+  }
+
+  return data;
+}
+
+export function createMockCaller({ user }: { user: User }) {
+  const session: Session = {
+    user: user,
+    expires: new Date().toISOString(),
+  };
+
+  const ctx = {
+    session,
+    prisma,
+  };
+
+  const caller = appRouter.createCaller(ctx);
+
+  return caller;
 }
