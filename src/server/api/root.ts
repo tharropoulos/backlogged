@@ -6,6 +6,7 @@ import { featureRouter } from "./routers/feature";
 import { genreRouter } from "./routers/genre";
 import { platformRouter } from "./routers/platform";
 import { gameRouter } from "./routers/game";
+import { reviewRouter } from "./routers/review";
 
 /**
  * This is the primary router for your server.
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   genre: genreRouter,
   platform: platformRouter,
   game: gameRouter,
+  review: reviewRouter,
 });
 
 // export type definition of API
