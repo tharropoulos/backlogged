@@ -1,4 +1,4 @@
-import { TRPCError, procedureTypes } from "@trpc/server";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { type Result, Ok, Err } from "ts-results"; //NOTE: Written by myself
 import {
@@ -7,9 +7,8 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { createReviewSchema } from "~/lib/validations/review"; // Copilot suggestion
-import { Prisma, type Review } from "@prisma/client"; // NOTE: Copilot suggestion
+import { type Review } from "@prisma/client"; // NOTE: Copilot suggestion
 import { handlePrismaError } from "~/lib/utils";
-import { TrpcQueryOptionsForUseQueries } from "@trpc/react-query/dist/internals/useQueries";
 //NOTE: Written by Copilot
 
 export const reviewRouter = createTRPCRouter({
@@ -23,7 +22,7 @@ export const reviewRouter = createTRPCRouter({
               connect: { id: input.gameId },
             },
             user: {
-              connect: { id: input.userId },
+              connect: { id: ctx.session.user.id },
             },
             createdAt: new Date(), //NOTE: Written by Copilot
             updatedAt: new Date(), //NOTE: Suggested by Copilot
@@ -78,7 +77,7 @@ export const reviewRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }): Promise<Result<Review, TRPCError>> => {
       const result: Result<Review, TRPCError> = await ctx.prisma.review
         .update({
-          where: { id: input.id },
+          where: { id: input.id, userId: ctx.session.user.id },
           data: {
             content: input.content,
             rating: input.rating,
@@ -96,7 +95,7 @@ export const reviewRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }): Promise<Result<Review, TRPCError>> => {
       const result: Result<Review, TRPCError> = await ctx.prisma.review
         .delete({
-          where: { id: input.id },
+          where: { id: input.id, userId: ctx.session.user.id },
         })
         .then((res) => Ok(res), handlePrismaError);
 
@@ -107,19 +106,22 @@ export const reviewRouter = createTRPCRouter({
     .input(
       z.object({
         reviewId: z.string(),
-        userId: z.string(),
       })
     )
     .mutation(async ({ ctx, input }): Promise<Result<Review, TRPCError>> => {
       const result: Result<Review, TRPCError> = await ctx.prisma.review
         .update({
-          where: { id: input.reviewId },
+          where: { id: input.reviewId, userId: ctx.session.user.id },
           data: {
             likes: {
+              deleteMany: {
+                userId: ctx.session.user.id,
+                reviewId: input.reviewId,
+              },
               create: [
                 {
                   user: {
-                    connect: { id: input.userId },
+                    connect: { id: ctx.session.user.id },
                   },
                 },
               ],
@@ -135,7 +137,6 @@ export const reviewRouter = createTRPCRouter({
     .input(
       z.object({
         reviewId: z.string(),
-        userId: z.string(),
       })
     )
     .mutation(async ({ ctx, input }): Promise<Result<Review, TRPCError>> => {
@@ -143,11 +144,12 @@ export const reviewRouter = createTRPCRouter({
         .update({
           where: {
             id: input.reviewId,
+            userId: ctx.session.user.id,
           },
           data: {
             likes: {
               deleteMany: {
-                userId: input.userId,
+                userId: ctx.session.user.id,
               },
             },
           },
