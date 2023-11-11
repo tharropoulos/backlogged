@@ -114,10 +114,6 @@ export const reviewRouter = createTRPCRouter({
           where: { id: input.reviewId, userId: ctx.session.user.id },
           data: {
             likes: {
-              deleteMany: {
-                userId: ctx.session.user.id,
-                reviewId: input.reviewId,
-              },
               create: [
                 {
                   user: {

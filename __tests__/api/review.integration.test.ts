@@ -487,7 +487,7 @@ describe("When liking a Review", () => {
       });
     });
     describe("and the user has already liked the Review", () => {
-      it("shouldn't add more likes", async () => {
+      it("should return an error", async () => {
         //Arrange
         const { review, user } = await createTestData({
           review: true,
@@ -506,16 +506,8 @@ describe("When liking a Review", () => {
             reviewId: review.val.id,
           });
 
-          const updatedReview = await prisma.review.findUnique({
-            where: { id: review.val.id },
-            select: { likes: true },
-          });
-
           //Assert
-          expect(result.ok).toBe(true);
-          expect(result.val).toMatchObject(review.val);
-          expect(updatedReview?.likes).toMatchObject([{ userId: user.val.id }]);
-          expect(updatedReview?.likes).toHaveLength(1);
+          expect(result.ok).toBe(false);
         } else {
           throw new Error("TEST ERROR: Review or User failed to create");
         }
