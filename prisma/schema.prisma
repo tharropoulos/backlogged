@@ -42,14 +42,14 @@ model ReviewLike {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    reviewId  String @unique
-    review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade) 
-    userId    String @unique
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
+    reviewId  String   @unique
+    review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+    userId    String   @unique
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    @@unique([userId, reviewId])
     @@index([reviewId])
     @@index([userId])
-    @@unique([userId, reviewId])
 }
 
 model CommentLike {
@@ -61,9 +61,9 @@ model CommentLike {
     userId    String
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    @@unique([userId, commentId])
     @@index([commentId])
     @@index([userId])
-    @@unique([userId, commentId])
 }
 
 model Comment {
@@ -82,8 +82,8 @@ model Comment {
     deleted   DateTime?
 
     @@index([reviewId])
-    @@index([parentId])
     @@index([userId])
+    @@index([parentId])
 }
 
 model Review {
@@ -97,7 +97,7 @@ model Review {
     rating    Int?
     content   String       @db.Text
     comments  Comment[]
-    likes     ReviewLike[] 
+    likes     ReviewLike[]
 
     @@index([gameId])
     @@index([userId])
@@ -135,9 +135,9 @@ model GameToPlatform {
     platform   Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
     storeLink  String   @map("store_link") @db.VarChar(191)
 
+    @@unique([gameId, platformId])
     @@index([gameId])
     @@index([platformId])
-    @@unique([gameId, platformId])
 }
 
 model Developer {
