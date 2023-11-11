@@ -7,7 +7,8 @@ import {
   type Game,
   type Franchise,
   type User,
-  Review,
+  type Review,
+  Comment,
 } from "@prisma/client";
 import { type Option, Err, None, Some } from "ts-results";
 import { type createPublisherSchema } from "./validations/publisher";
@@ -17,11 +18,10 @@ import { type createReviewSchema } from "./validations/review";
 import { faker } from "@faker-js/faker";
 import { type createUserSchema } from "./validations/user";
 import { type z } from "zod";
-import { createId } from "@paralleldrive/cuid2";
 import { prisma } from "~/server/db";
 import { appRouter } from "~/server/api/root";
-import { Session } from "next-auth";
-import { userAgent } from "next/server";
+import type { Session } from "next-auth";
+import { createCommentSchema } from "./validations/comment";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -115,6 +115,17 @@ async function createReview(
 ): Promise<Review> {
   return await prisma.review.create({ data: data });
 }
+
+async function createComment(
+  data: z.infer<typeof createCommentSchema> & { userId: string }
+): Promise<Comment> {
+  return await prisma.comment.create({
+    data: {
+      ...data,
+      createdAt: new Date(),
+    },
+  });
+}
 //NOTE: Copilot suggestion
 type PromiseType<T> = T extends Promise<infer U> ? U : never;
 
@@ -124,6 +135,7 @@ type TestDataOptions = {
   game?: boolean;
   review?: boolean;
   user?: boolean;
+  comment?: "parent_only" | "child" | undefined;
 };
 
 export async function createTestData(options: TestDataOptions) {
@@ -133,15 +145,19 @@ export async function createTestData(options: TestDataOptions) {
     game: Option<PromiseType<ReturnType<typeof createGame>>>;
     user: Option<PromiseType<ReturnType<typeof createUser>>>;
     review: Option<PromiseType<ReturnType<typeof createReview>>>;
+    comment: Option<PromiseType<ReturnType<typeof createComment>>>;
+    child: Option<PromiseType<ReturnType<typeof createComment>>>;
   } = {
     publisher: None,
     franchise: None,
     game: None,
     user: None,
     review: None,
+    comment: None,
+    child: None,
   };
 
-  if (options.publisher || options.game || options.review) {
+  if (options.publisher || options.game || options.review || options.comment) {
     data.publisher = new Some(
       await createPublisher({
         coverImage: faker.image.url(),
@@ -151,7 +167,7 @@ export async function createTestData(options: TestDataOptions) {
     );
   }
 
-  if (options.publisher || options.game || options.review) {
+  if (options.publisher || options.game || options.review || options.comment) {
     data.franchise = new Some(
       await createFranchise({
         name: faker.company.name(),
@@ -161,7 +177,7 @@ export async function createTestData(options: TestDataOptions) {
     );
   }
 
-  if (options.game || options.review) {
+  if (options.game || options.review || options.comment) {
     data.game = new Some(
       await createGame({
         name: faker.commerce.productName(),
@@ -175,7 +191,7 @@ export async function createTestData(options: TestDataOptions) {
     );
   }
 
-  if (options.user || options.review) {
+  if (options.user || options.review || options.comment) {
     data.user = new Some(
       await createUser({
         name: faker.person.firstName(),
@@ -186,7 +202,7 @@ export async function createTestData(options: TestDataOptions) {
     );
   }
 
-  if (options.review) {
+  if (options.review || options.comment) {
     data.review = new Some(
       await createReview({
         rating: faker.number.int({ min: 1, max: 5 }),
@@ -197,6 +213,34 @@ export async function createTestData(options: TestDataOptions) {
     );
   }
 
+  if (options.comment === "parent_only") {
+    data.comment = new Some(
+      await createComment({
+        content: faker.lorem.paragraph(),
+        reviewId: data.review.unwrap().id,
+        userId: data.user.unwrap().id,
+      })
+    );
+  }
+
+  if (options.comment === "child") {
+    data.comment = new Some(
+      await createComment({
+        content: faker.lorem.paragraph(),
+        reviewId: data.review.unwrap().id,
+        userId: data.user.unwrap().id,
+      })
+    );
+
+    data.child = new Some(
+      await createComment({
+        content: faker.lorem.paragraph(),
+        reviewId: data.review.unwrap().id,
+        userId: data.user.unwrap().id,
+        parentId: data.comment.unwrap().id,
+      })
+    );
+  }
   return data;
 }
 
