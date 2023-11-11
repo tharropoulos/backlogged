@@ -79,6 +79,7 @@ model Comment {
     parent    Comment?      @relation("CommentToComment", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
     children  Comment[]     @relation("CommentToComment")
     likes     CommentLike[]
+    deleted   DateTime?
 
     @@index([reviewId])
     @@index([parentId])
