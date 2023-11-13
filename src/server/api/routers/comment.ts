@@ -10,10 +10,11 @@ import {
 import { Prisma, type Comment } from "@prisma/client";
 import { handlePrismaError } from "~/lib/utils";
 
-type CommentDetails = {
+export type CommentDetails = {
   _count: {
     likes: number;
   };
+  id: string;
   content: string;
   user: {
     image: string | null;
