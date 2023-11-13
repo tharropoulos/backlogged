@@ -8,6 +8,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { Prisma, type Comment } from "@prisma/client";
+import { createCommentSchema } from "~/lib/validations/comment";
 import { handlePrismaError } from "~/lib/utils";
 
 export type CommentDetails = {
@@ -28,13 +29,6 @@ export type CommentDetails = {
   children: Array<Omit<CommentDetails, "children">>;
 };
 // Define your input validation schema
-const createCommentSchema = z.object({
-  content: z.string(),
-  userId: z.string(),
-  reviewId: z.string(),
-  parentId: z.string().optional(),
-});
-
 export const commentRouter = createTRPCRouter({
   getAll: publicProcedure.query(
     async ({ ctx }): Promise<Result<Array<Comment>, TRPCError>> => {
