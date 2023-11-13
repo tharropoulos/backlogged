@@ -197,6 +197,7 @@ export const commentRouter = createTRPCRouter({
               likes: true,
             },
           },
+          id: true,
           content: true,
           user: {
             select: {
