@@ -99,7 +99,7 @@ afterAll(async () => {
   await prisma.$disconnect();
 });
 
-const user: User = {
+const mockUser: User = {
   id: createId(),
   name: "Test User",
   email: "email",
@@ -114,7 +114,7 @@ const unauthorizedCaller = appRouter.createCaller({
 
 const mockSession: Session = {
   expires: new Date().toISOString(),
-  user: user,
+  user: mockUser,
 };
 const authorizedCaller = appRouter.createCaller({
   session: mockSession,
