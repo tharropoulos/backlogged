@@ -131,7 +131,7 @@ export const commentRouter = createTRPCRouter({
   like: protectedProcedure
     .input(
       z.object({
-        commentId: z.string(),
+        id: z.string(),
       })
     )
     .mutation(async ({ ctx, input }): Promise<Result<Comment, TRPCError>> => {
@@ -162,7 +162,7 @@ export const commentRouter = createTRPCRouter({
   unlike: protectedProcedure
     .input(
       z.object({
-        commentId: z.string(),
+        id: z.string(),
       })
     )
     .mutation(async ({ ctx, input }): Promise<Result<Comment, TRPCError>> => {
@@ -170,7 +170,7 @@ export const commentRouter = createTRPCRouter({
       const result: Result<Comment, TRPCError> = await ctx.prisma.comment
         .update({
           where: {
-            id: input.commentId,
+            id: input.id,
             userId: ctx.session.user.id,
           },
           data: {
