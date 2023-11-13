@@ -7,7 +7,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { type Comment, Prisma } from "@prisma/client";
+import { Prisma, type Comment } from "@prisma/client";
 import { handlePrismaError } from "~/lib/utils";
 
 type CommentDetails = {
