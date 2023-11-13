@@ -66,21 +66,30 @@ export const commentRouter = createTRPCRouter({
   create: protectedProcedure
     .input(createCommentSchema)
     .mutation(async ({ ctx, input }): Promise<Result<Comment, TRPCError>> => {
+      let commentInput:
+        | Prisma.CommentCreateInput
+        | Prisma.CommentUncheckedCreateInput;
+
+      if (typeof input.parentId === "string") {
+        commentInput = {
+          content: input.content,
+          user: { connect: { id: ctx.session.user.id } },
+          review: { connect: { id: input.reviewId } },
+          parent: { connect: { id: input.parentId } },
+        };
+      } else {
+        commentInput = {
+          content: input.content,
+          user: { connect: { id: ctx.session.user.id } },
+          review: { connect: { id: input.reviewId } },
+        };
+      }
+
+      // Use commentInput in your function
       const result: Result<Comment, TRPCError> = await ctx.prisma.comment
         //NOTE: Copilot suggestion
         .create({
-          data: {
-            content: input.content,
-            user: {
-              connect: { id: ctx.session.user.id },
-            },
-            review: {
-              connect: { id: input.reviewId },
-            },
-            parent: {
-              connect: { id: input.parentId },
-            },
-          },
+          data: commentInput,
         })
         .then((res) => Ok(res), handlePrismaError);
 
