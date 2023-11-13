@@ -138,7 +138,10 @@ export const commentRouter = createTRPCRouter({
       //NOTE: Copilot suggestion
       const result: Result<Comment, TRPCError> = await ctx.prisma.comment
         .update({
-          where: { id: input.commentId, userId: ctx.session.user.id },
+          where: { id: input.id, userId: ctx.session.user.id },
+          include: {
+            likes: true,
+          },
           data: {
             likes: {
               create: [
