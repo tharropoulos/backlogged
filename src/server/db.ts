@@ -1,15 +1,23 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { env } from "~/env.mjs";
+import { extendedPrismaClient } from "~/services/prisma-service";
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+/**
+ * Use the extended Prisma Client instead of the default one
+ * @see https://github.com/prisma/prisma/discussions/20321
+ */
+const getExtendedClient = () => {
+  return extendedPrismaClient;
 };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log:
-      env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  });
+type ExtendedPrismaClient = ReturnType<typeof getExtendedClient>;
+const globalForPrisma = globalThis as unknown as {
+  prisma: ExtendedPrismaClient | undefined;
+};
+
+export const prisma = globalForPrisma.prisma ?? getExtendedClient();
+// const globalForPrisma = globalThis as unknown as {
+//   prisma: PrismaClient | undefined;
+// };
 
 if (env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

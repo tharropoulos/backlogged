@@ -1,4 +1,5 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaClient } from "@prisma/client";
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
@@ -8,6 +9,10 @@ import {
 import DiscordProvider from "next-auth/providers/discord";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
+import {
+  CustomPrismaAdapter,
+  extendedPrismaClient,
+} from "~/services/prisma-service";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -45,7 +50,13 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   },
-  adapter: PrismaAdapter(prisma),
+  /**
+   * Needs a custom adapter to work with the Extended Client (different types). See the following GitHub issue for more info:
+   * @see https://github.com/nextauthjs/next-auth/issues/6078#issuecomment-1435940753
+   */
+  adapter: CustomPrismaAdapter(
+    prisma as unknown as typeof extendedPrismaClient
+  ),
   providers: [
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
