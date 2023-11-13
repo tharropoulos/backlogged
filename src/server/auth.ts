@@ -1,5 +1,3 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
@@ -11,7 +9,7 @@ import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 import {
   CustomPrismaAdapter,
-  extendedPrismaClient,
+  type extendedPrismaClient,
 } from "~/services/prisma-service";
 
 /**
