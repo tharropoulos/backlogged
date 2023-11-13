@@ -120,8 +120,8 @@ export const commentRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }): Promise<Result<Comment, TRPCError>> => {
       const result: Result<Comment, TRPCError> = await ctx.prisma.comment
-        .delete({
-          where: { id: input.id },
+        .softDelete({
+          where: { id: input.id, userId: ctx.session.user.id },
         })
         .then((res) => Ok(res), handlePrismaError);
 
