@@ -221,8 +221,7 @@ model Playlist {
     games       Game[]
     createdAt   DateTime           @default(now())
     updatedAt   DateTime           @updatedAt
-    deletedAt   DateTime?
-    deleted     Boolean            @default(false)
+    deleted     DateTime?
     visibility  PlaylistVisibility
     likes       PlaylistLike[]
 
