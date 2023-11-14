@@ -214,7 +214,7 @@ model User {
 model Playlist {
     id          String             @id @default(cuid())
     name        String             @db.VarChar(191)
-    description String?            @db.VarChar(191)
+    description String?            @db.Text
     type        PlaylistType
     userId      String
     user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
