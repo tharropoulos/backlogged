@@ -237,6 +237,7 @@ model PlaylistLike {
     userId     String
     user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    @@unique([userId, playlistId])
     @@index([playlistId])
     @@index([userId])
 }
