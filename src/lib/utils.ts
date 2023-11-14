@@ -9,6 +9,7 @@ import {
   type User,
   type Review,
   Comment,
+  Playlist,
 } from "@prisma/client";
 import { type Option, Err, None, Some } from "ts-results";
 import { type createPublisherSchema } from "./validations/publisher";
@@ -22,6 +23,7 @@ import { prisma } from "~/server/db";
 import { appRouter } from "~/server/api/root";
 import type { Session } from "next-auth";
 import { createCommentSchema } from "./validations/comment";
+import { createPlaylistSchema } from "./validations/playlist";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -126,6 +128,20 @@ async function createComment(
     },
   });
 }
+
+async function createPlaylist(
+  data: z.infer<typeof createPlaylistSchema> & { userId: string }
+): Promise<Playlist> {
+  return await prisma.playlist.create({
+    data: {
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      type: "CUSTOM",
+    },
+  });
+}
+
 //NOTE: Copilot suggestion
 type PromiseType<T> = T extends Promise<infer U> ? U : never;
 
@@ -136,6 +152,7 @@ type TestDataOptions = {
   review?: boolean;
   user?: boolean;
   comment?: "parent_only" | "child" | undefined;
+  playlist?: "public" | "private" | "followers_only" | undefined;
 };
 
 export async function createTestData(options: TestDataOptions) {
@@ -147,6 +164,7 @@ export async function createTestData(options: TestDataOptions) {
     review: Option<PromiseType<ReturnType<typeof createReview>>>;
     comment: Option<PromiseType<ReturnType<typeof createComment>>>;
     child: Option<PromiseType<ReturnType<typeof createComment>>>;
+    playlist: Option<PromiseType<ReturnType<typeof createPlaylist>>>;
   } = {
     publisher: None,
     franchise: None,
@@ -155,6 +173,7 @@ export async function createTestData(options: TestDataOptions) {
     review: None,
     comment: None,
     child: None,
+    playlist: None,
   };
 
   if (options.publisher || options.game || options.review || options.comment) {
@@ -191,7 +210,7 @@ export async function createTestData(options: TestDataOptions) {
     );
   }
 
-  if (options.user || options.review || options.comment) {
+  if (options.user || options.review || options.comment || options.playlist) {
     data.user = new Some(
       await createUser({
         name: faker.person.firstName(),
@@ -223,6 +242,39 @@ export async function createTestData(options: TestDataOptions) {
     );
   }
 
+  if (options.playlist === "public") {
+    data.playlist = new Some(
+      await createPlaylist({
+        description: faker.lorem.words(),
+        name: faker.lorem.words(),
+        userId: data.user.unwrap().id,
+        visibility: "PUBLIC",
+      })
+    );
+  }
+
+  if (options.playlist === "private") {
+    data.playlist = new Some(
+      await createPlaylist({
+        description: faker.lorem.words(),
+        name: faker.lorem.words(),
+        userId: data.user.unwrap().id,
+        visibility: "PRIVATE",
+      })
+    );
+  }
+
+  if (options.playlist === "followers_only") {
+    data.playlist = new Some(
+      await createPlaylist({
+        description: faker.lorem.words(),
+        name: faker.lorem.words(),
+        userId: data.user.unwrap().id,
+        visibility: "FOLLOWERS_ONLY",
+      })
+    );
+  }
+
   if (options.comment === "child") {
     data.comment = new Some(
       await createComment({
@@ -241,6 +293,7 @@ export async function createTestData(options: TestDataOptions) {
       })
     );
   }
+
   return data;
 }
 
