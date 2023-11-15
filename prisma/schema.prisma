@@ -32,7 +32,7 @@ model Game {
     platforms       GameToPlatform[]
     features        Feature[]
     reviews         Review[]
-    playlists       Playlist[]
+    playlists       GameToPlaylist[]
 
     @@index([publisherId])
     @@index([franchiseId])
@@ -128,7 +128,7 @@ model Platform {
 
 // The reason I added this model is because I wanted to add an online store link to the game for each platform
 model GameToPlatform {
-    id         Int      @id @default(autoincrement()) // Int is lighter on rights than cuid
+    id         String   @id @default(cuid())
     gameId     String
     platformId String
     game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
@@ -218,14 +218,28 @@ model Playlist {
     type        PlaylistType
     userId      String
     user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-    games       Game[]
     createdAt   DateTime           @default(now())
     updatedAt   DateTime           @updatedAt
     deleted     DateTime?
     visibility  PlaylistVisibility
     likes       PlaylistLike[]
+    games       GameToPlaylist[]
 
     @@index([userId])
+}
+
+model GameToPlaylist {
+    id         String   @id @default(cuid())
+    gameId     String
+    playlistId String
+    addedAt    DateTime @default(now())
+    order      Int      @default(autoincrement())
+    game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+    playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+
+    @@index([gameId])
+    @@index([playlistId])
+    @@index([order])
 }
 
 model PlaylistLike {
