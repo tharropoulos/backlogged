@@ -2,32 +2,92 @@ import { TRPCError } from "@trpc/server";
 import { type Result, Ok, Err } from "ts-results";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { Playlist } from "@prisma/client";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
+import type { Prisma, Playlist } from "@prisma/client";
 import { handlePrismaError } from "~/lib/utils";
 import { z } from "zod";
 
 export const playlistRouter = createTRPCRouter({
   getAll: publicProcedure.query(
     async ({ ctx }): Promise<Result<Array<Playlist>, TRPCError>> => {
+      const userId = ctx.session?.user?.id;
+
+      const whereClause: Prisma.PlaylistWhereInput = {
+        OR: [
+          {
+            visibility: "PUBLIC",
+          },
+        ],
+      };
+
+      if (userId) {
+        whereClause.OR?.push(
+          {
+            userId: userId,
+          },
+          {
+            visibility: "FOLLOWERS_ONLY",
+            user: {
+              followers: {
+                some: {
+                  followerId: userId,
+                },
+              },
+            },
+          }
+        );
+      }
+
       const result: Result<
         Array<Playlist>,
         TRPCError
       > = await ctx.prisma.playlist
-        .findMany()
+        .findMany({ where: whereClause })
         .then((res) => Ok(res), handlePrismaError);
 
       return result;
     }
   ),
 
-  //NOTE: Copilot Suggestion
   getById: publicProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string().cuid2() }))
     .query(async ({ ctx, input }): Promise<Result<Playlist, TRPCError>> => {
-      const result: Result<Playlist, TRPCError> = await ctx.prisma.playlist
-        .findUnique({
-          where: {
-            id: input.id,
+      const userId = ctx.session?.user?.id;
+
+      const whereClause: Prisma.PlaylistWhereInput = {
+        id: input.id,
+        OR: [
+          {
+            visibility: "PUBLIC",
           },
+        ],
+      };
+
+      if (userId) {
+        whereClause.OR?.push(
+          {
+            userId: userId,
+          },
+          {
+            visibility: "FOLLOWERS_ONLY",
+            user: {
+              followers: {
+                some: {
+                  followerId: userId,
+                },
+              },
+            },
+          }
+        );
+      }
+
+      const result: Result<Playlist, TRPCError> = await ctx.prisma.playlist
+        .findFirst({
+          where: whereClause,
         })
         .then((res) => {
           return res
