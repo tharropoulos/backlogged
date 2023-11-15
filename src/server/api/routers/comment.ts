@@ -171,7 +171,11 @@ export const commentRouter = createTRPCRouter({
         .update({
           where: {
             id: input.id,
-            userId: ctx.session.user.id,
+            likes: {
+              some: {
+                userId: ctx.session.user.id,
+              },
+            },
           },
           data: {
             likes: {
