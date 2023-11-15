@@ -12,7 +12,6 @@ import { type z } from "zod";
 import { CommentDetails } from "~/server/api/routers/comment";
 
 beforeAll(async () => {
-  console.log("Everything deleted on: ", process.env.DATABASE_URL);
   const { publisher, franchise, game } = await createTestData({
     franchise: true,
     publisher: true,
@@ -31,6 +30,8 @@ afterAll(async () => {
   const deleteDevelopers = prisma.developer.deleteMany();
   const deleteFeatures = prisma.feature.deleteMany();
   const deleteReviews = prisma.review.deleteMany();
+  const deletePlaylists = prisma.playlist.deleteMany();
+  const deleteFollows = prisma.follows.deleteMany();
   const deleteUsers = prisma.user.deleteMany();
 
   await prisma.$transaction([
@@ -42,6 +43,8 @@ afterAll(async () => {
     deleteDevelopers,
     deleteFeatures,
     deleteReviews,
+    deletePlaylists,
+    deleteFollows,
     deleteUsers,
   ]);
   await prisma.$disconnect();
@@ -73,7 +76,7 @@ const mockSession: Session = {
   expires: new Date().toISOString(),
   user: mockUser,
 };
-const authenitcatedCaller = appRouter.createCaller({
+const authenticatedCaller = appRouter.createCaller({
   session: mockSession,
   prisma: prisma,
 });
@@ -197,7 +200,7 @@ describe("When retrieving a comment by Id", () => {
     it("should return an error", async () => {
       //NOTE: Written by myself
       //Act
-      const result = await authenitcatedCaller.comment.getById({
+      const result = await authenticatedCaller.comment.getById({
         id: createId(),
       });
 
@@ -213,7 +216,7 @@ describe("When retrieving a comment by Id", () => {
 
       if (comment.some) {
         //Act
-        const result = await authenitcatedCaller.comment.getById({
+        const result = await authenticatedCaller.comment.getById({
           id: comment.val.id,
         });
 
@@ -232,7 +235,7 @@ describe("When retrieving all comments", () => {
     it("should return an empty array", async () => {
       //NOTE: Copilot suggestion
       //Act
-      const result = await authenitcatedCaller.comment.getAll();
+      const result = await authenticatedCaller.comment.getAll();
 
       //Assert
       expect(result.ok).toBe(true);
@@ -248,7 +251,7 @@ describe("When retrieving all comments", () => {
 
       if (comment.some) {
         //Act
-        const result = await authenitcatedCaller.comment.getAll();
+        const result = await authenticatedCaller.comment.getAll();
 
         //Assert
         expect(result.ok).toBe(true);
@@ -276,7 +279,7 @@ describe("When deleting a comment", () => {
         //NOTE: Copilot suggestion
         //Act
         //NOTE: Written by myself
-        const result = await authenitcatedCaller.comment.delete({
+        const result = await authenticatedCaller.comment.delete({
           id: createId(),
         });
 
@@ -395,7 +398,7 @@ describe("When updating a comment", () => {
       it("should return an error", async () => {
         //NOTE: Copilot suggestion
         //Act
-        const result = await authenitcatedCaller.comment.update({
+        const result = await authenticatedCaller.comment.update({
           id: createId(),
           content: faker.lorem.paragraph(),
         });
@@ -501,7 +504,7 @@ describe("When liking a comment", () => {
       it("should return an error", async () => {
         //NOTE: Copilot suggestion
         //Act
-        const result = await authenitcatedCaller.comment.like({
+        const result = await authenticatedCaller.comment.like({
           id: createId(),
         });
 
@@ -521,7 +524,7 @@ describe("When liking a comment", () => {
           //NOTE: Written by myself
           await prisma.comment.softDelete({ where: { id: comment.val.id } });
 
-          const result = await authenitcatedCaller.comment.like({
+          const result = await authenticatedCaller.comment.like({
             id: comment.val.id,
           });
 
@@ -609,7 +612,7 @@ describe("When unliking a comment", () => {
       it("should return an error", async () => {
         //NOTE: Copilot suggestion
         //Act
-        const result = await authenitcatedCaller.comment.unlike({
+        const result = await authenticatedCaller.comment.unlike({
           id: createId(),
         });
 
@@ -630,7 +633,7 @@ describe("When unliking a comment", () => {
         //NOTE: Written by myself
         await prisma.comment.softDelete({ where: { id: comment.val.id } });
 
-        const result = await authenitcatedCaller.comment.unlike({
+        const result = await authenticatedCaller.comment.unlike({
           id: comment.val.id,
         });
 
@@ -657,7 +660,7 @@ describe("When unliking a comment", () => {
 
         if (comment.some) {
           //Act
-          const result = await authenitcatedCaller.comment.unlike({
+          const result = await authenticatedCaller.comment.unlike({
             id: comment.val.id,
           });
 
@@ -709,7 +712,7 @@ describe("When retrieving a comment's details", () => {
     it("should return an error", async () => {
       //NOTE: Copilot suggestion
       //Act
-      const result = await authenitcatedCaller.comment.getDetails({
+      const result = await authenticatedCaller.comment.getDetails({
         id: createId(),
       });
 
@@ -729,7 +732,7 @@ describe("When retrieving a comment's details", () => {
         if (comment.some) {
           await prisma.comment.softDelete({ where: { id: comment.val.id } });
 
-          const result = await authenitcatedCaller.comment.getDetails({
+          const result = await authenticatedCaller.comment.getDetails({
             id: comment.val.id,
           });
 
@@ -750,7 +753,7 @@ describe("When retrieving a comment's details", () => {
       });
 
       if (comment.some && child.some && user.some) {
-        const result = await authenitcatedCaller.comment.getDetails({
+        const result = await authenticatedCaller.comment.getDetails({
           id: comment.val.id,
         });
 

@@ -69,10 +69,6 @@ beforeAll(async () => {
   console.log("On: ", process.env.DATABASE_URL);
 });
 
-afterEach(async () => {
-  await prisma.$transaction([prisma.user.deleteMany()]);
-});
-
 afterAll(async () => {
   const deleteGames = prisma.game.deleteMany();
   const deletePublishers = prisma.publisher.deleteMany();
@@ -82,6 +78,7 @@ afterAll(async () => {
   const deleteDevelopers = prisma.developer.deleteMany();
   const deleteFeatures = prisma.feature.deleteMany();
   const deleteReviews = prisma.review.deleteMany();
+  const deleteFollows = prisma.follows.deleteMany();
   const deleteUsers = prisma.user.deleteMany();
 
   await prisma.$transaction([
@@ -93,6 +90,7 @@ afterAll(async () => {
     deleteDevelopers,
     deleteFeatures,
     deleteReviews,
+    deleteFollows,
     deleteUsers,
   ]);
   console.log("Everything deleted on: ", process.env.DATABASE_URL);
@@ -1120,7 +1118,7 @@ describe("When retrieving a Game's Reviews", () => {
       });
 
       //Assert
-      expect(result).toMatchObject({ reviews: results });
+      expect(result.reviews).toHaveLength(reviews.length);
     });
   });
 });

@@ -30,6 +30,8 @@ afterAll(async () => {
   const deleteDevelopers = prisma.developer.deleteMany();
   const deleteFeatures = prisma.feature.deleteMany();
   const deleteReviews = prisma.review.deleteMany();
+  const deletePlaylists = prisma.playlist.deleteMany();
+  const deleteFollows = prisma.follows.deleteMany();
   const deleteUsers = prisma.user.deleteMany();
 
   await prisma.$transaction([
@@ -41,9 +43,10 @@ afterAll(async () => {
     deleteDevelopers,
     deleteFeatures,
     deleteReviews,
+    deletePlaylists,
+    deleteFollows,
     deleteUsers,
   ]);
-  console.log("Everything deleted on: ", process.env.DATABASE_URL);
   await prisma.$disconnect();
 });
 
