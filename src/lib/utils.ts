@@ -107,9 +107,25 @@ async function createGame(
 }
 
 async function createUser(
-  data: z.infer<typeof createUserSchema>
+  data: z.infer<typeof createUserSchema> & { followers?: Array<{ id: string }> }
 ): Promise<User> {
-  return await prisma.user.create({ data: data });
+  return await prisma.user.create({
+    data: {
+      ...data,
+      followers: {
+        create: data.followers?.map((follower) => ({
+          follower: {
+            connect: {
+              id: follower.id,
+            },
+          },
+        })),
+      },
+    },
+    include: {
+      followers: true,
+    },
+  });
 }
 
 async function createReview(
@@ -165,6 +181,7 @@ export async function createTestData(options: TestDataOptions) {
     comment: Option<PromiseType<ReturnType<typeof createComment>>>;
     child: Option<PromiseType<ReturnType<typeof createComment>>>;
     playlist: Option<PromiseType<ReturnType<typeof createPlaylist>>>;
+    follower: Option<PromiseType<ReturnType<typeof createUser>>>;
   } = {
     publisher: None,
     franchise: None,
@@ -174,6 +191,7 @@ export async function createTestData(options: TestDataOptions) {
     comment: None,
     child: None,
     playlist: None,
+    follower: None,
   };
 
   if (options.publisher || options.game || options.review || options.comment) {
@@ -211,12 +229,21 @@ export async function createTestData(options: TestDataOptions) {
   }
 
   if (options.user || options.review || options.comment || options.playlist) {
+    data.follower = new Some(
+      await createUser({
+        name: faker.person.firstName(),
+        email: faker.internet.email(),
+        emailVerified: faker.date.past(),
+        image: faker.image.avatar(),
+      })
+    );
     data.user = new Some(
       await createUser({
         name: faker.person.firstName(),
         email: faker.internet.email(),
         emailVerified: faker.date.past(),
         image: faker.image.avatar(),
+        followers: [{ id: data.follower.unwrap().id }],
       })
     );
   }
