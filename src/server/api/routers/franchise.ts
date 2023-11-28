@@ -7,72 +7,72 @@ import {
 } from "~/server/api/trpc";
 
 import { createFranchiseSchema } from "~/lib/validations/franchise";
+import { type Franchise } from "@prisma/client";
+import { type Result, Ok, Err } from "ts-results";
+import { handlePrismaError } from "~/utils";
 
 export const franchiseRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const res = await ctx.prisma.franchise.findMany();
-    console.log(res);
-    return res;
-  }),
+  getAll: publicProcedure.query(
+    async ({ ctx }): Promise<Result<Array<Franchise>, TRPCError>> => {
+      const result: Result<
+        Array<Franchise>,
+        TRPCError
+      > = await ctx.prisma.franchise
+        .findMany()
+        .then((res) => Ok(res), handlePrismaError);
+
+      return result;
+    }
+  ),
 
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const res = await ctx.prisma.franchise.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
+    .query(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
+      const result: Result<Franchise, TRPCError> = await ctx.prisma.franchise
+        .findUnique({
+          where: {
+            id: input.id,
+          },
+        })
+        .then((res) => {
+          return res
+            ? Ok(res)
+            : new Err(
+                new TRPCError({
+                  code: "NOT_FOUND",
+                  message: "Franchise not found",
+                })
+              );
+        }, handlePrismaError);
 
-      if (!res) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Franchise not found",
-        });
-      }
-      console.log(res);
-      return res;
+      return result;
     }),
 
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const instance = await ctx.prisma.franchise.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
+    .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
+      const result: Result<Franchise, TRPCError> = await ctx.prisma.franchise
+        .delete({
+          where: { id: input.id },
+        })
+        .then((res) => Ok(res), handlePrismaError);
 
-      if (!instance) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Franchise not found",
-        });
-      }
-      try {
-        const res = await ctx.prisma.franchise.delete({
-          where: {
-            id: input.id,
-          },
-        });
-        console.log(res);
-        return res;
-      } catch (err) {
-        console.error(err);
-        throw err;
-      }
+      return result;
     }),
+
   create: protectedProcedure
     .input(createFranchiseSchema)
-    .mutation(async ({ ctx, input }) => {
-      const franchise = await ctx.prisma.franchise.create({
-        data: {
-          name: input.name,
-          description: input.description,
-          backgroundImage: input.backgroundImage,
-        },
-      });
-      console.log(franchise);
+    .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
+      const franchise: Result<Franchise, TRPCError> = await ctx.prisma.franchise
+        .create({
+          data: {
+            name: input.name,
+            description: input.description,
+            backgroundImage: input.backgroundImage,
+          },
+        })
+        .then((res) => Ok(res), handlePrismaError);
+
       return franchise;
     }),
 
@@ -85,30 +85,19 @@ export const franchiseRouter = createTRPCRouter({
         backgroundImage: z.string().min(1).max(255),
       })
     )
-    .mutation(async ({ ctx, input }) => {
-      const instance = await ctx.prisma.franchise.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!instance) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Franchise not found",
-        });
-      }
-
-      const res = await ctx.prisma.franchise.update({
-        data: {
-          name: input.name,
-          description: input.description,
-          backgroundImage: input.backgroundImage,
-        },
-        where: {
-          id: input.id,
-        },
-      });
-      return res;
+    .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
+      const result: Result<Franchise, TRPCError> = await ctx.prisma.franchise
+        .update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            name: input.name,
+            description: input.description,
+            backgroundImage: input.backgroundImage,
+          },
+        })
+        .then((res) => Ok(res), handlePrismaError);
+      return result;
     }),
 });
