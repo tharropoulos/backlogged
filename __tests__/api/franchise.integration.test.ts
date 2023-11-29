@@ -17,6 +17,7 @@ afterAll(async () => {
 });
 
 const mockUser: User = {
+  role: "User",
   id: createId(),
   email: faker.internet.email(),
   image: faker.image.url(),
@@ -27,6 +28,19 @@ const mockSession: Session = {
   user: mockUser,
 };
 
+const mockAdmin: User = {
+  role: "Admin",
+  id: createId(),
+  email: faker.internet.email(),
+  image: faker.image.url(),
+  name: faker.person.firstName(),
+};
+
+const mockAdminSession: Session = {
+  expires: new Date().toISOString(),
+  user: mockAdmin,
+};
+
 const authenticatedCaller = appRouter.createCaller({
   session: mockSession,
   prisma: prisma,
@@ -34,6 +48,11 @@ const authenticatedCaller = appRouter.createCaller({
 
 const unauthenticatedCaller = appRouter.createCaller({
   session: null,
+  prisma: prisma,
+});
+
+const adminCaller = appRouter.createCaller({
+  session: mockAdminSession,
   prisma: prisma,
 });
 
@@ -52,20 +71,35 @@ describe("When creating a franchise", () => {
     });
   });
   describe("and the user is authenticated", () => {
-    it("should create a franchise", async () => {
-      // Arrange
-      const franchise: z.infer<typeof createFranchiseSchema> = {
-        name: faker.company.name(),
-        description: faker.company.catchPhrase(),
-        backgroundImage: faker.image.url(),
-      };
+    describe("and the user is not an admin", () => {
+      it("should throw an error", async () => {
+        // Act
+        const result = authenticatedCaller.franchise.create({
+          name: faker.company.name(),
+          description: faker.company.catchPhrase(),
+          backgroundImage: faker.image.url(),
+        });
 
-      // Act
-      const result = await authenticatedCaller.franchise.create(franchise);
+        // Assert
+        await expect(result).rejects.toThrowError();
+      });
+    });
+    describe("and the user is an admin", () => {
+      it("should create a franchise", async () => {
+        // Arrange
+        const franchise: z.infer<typeof createFranchiseSchema> = {
+          name: faker.company.name(),
+          description: faker.company.catchPhrase(),
+          backgroundImage: faker.image.url(),
+        };
 
-      // Assert
-      expect(result.ok).toBe(true);
-      expect(result.val).toMatchObject(franchise);
+        // Act
+        const result = await adminCaller.franchise.create(franchise);
+
+        // Assert
+        expect(result.ok).toBe(true);
+        expect(result.val).toMatchObject(franchise);
+      });
     });
   });
 });
@@ -171,46 +205,62 @@ describe("When updating a franchise", () => {
       await expect(result).rejects.toThrowError();
     });
   });
-
-  describe("and the franchise does not exist", () => {
-    it("should return an error", async () => {
-      // Act
-      const result = await authenticatedCaller.franchise.update({
-        id: createId(),
-        name: faker.company.name(),
-        description: faker.company.catchPhrase(),
-        backgroundImage: faker.image.url(),
-      });
-
-      // Assert
-      expect(result.ok).toBe(false);
-    });
-  });
-
-  describe("and the franchise exists", () => {
-    it("should update the franchise", async () => {
-      // Arrange
-      const data = await prisma.franchise.create({
-        data: {
+  describe("and the user is authenticated", () => {
+    describe("and the user is not an admin", () => {
+      it("should throw an error", async () => {
+        // Act
+        const result = authenticatedCaller.franchise.update({
+          id: createId(),
           name: faker.company.name(),
           description: faker.company.catchPhrase(),
           backgroundImage: faker.image.url(),
-        },
+        });
+
+        // Assert
+        await expect(result).rejects.toThrowError();
       });
+    });
+    describe("and the user is an admin", () => {
+      describe("and the franchise does not exist", () => {
+        it("should return an error", async () => {
+          // Act
+          const result = await adminCaller.franchise.update({
+            id: createId(),
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            backgroundImage: faker.image.url(),
+          });
 
-      const expected: Franchise = {
-        id: data.id,
-        name: faker.company.name(),
-        description: faker.company.catchPhrase(),
-        backgroundImage: faker.image.url(),
-      };
+          // Assert
+          expect(result.ok).toBe(false);
+        });
+      });
+      describe("and the franchise exists", () => {
+        it("should update the franchise", async () => {
+          // Arrange
+          const data = await prisma.franchise.create({
+            data: {
+              name: faker.company.name(),
+              description: faker.company.catchPhrase(),
+              backgroundImage: faker.image.url(),
+            },
+          });
 
-      // Act
-      const result = await authenticatedCaller.franchise.update(expected);
+          const expected: Franchise = {
+            id: data.id,
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            backgroundImage: faker.image.url(),
+          };
 
-      // Assert
-      expect(result.ok).toBe(true);
-      expect(result.val).toMatchObject(expected);
+          // Act
+          const result = await adminCaller.franchise.update(expected);
+
+          // Assert
+          expect(result.ok).toBe(true);
+          expect(result.val).toMatchObject(expected);
+        });
+      });
     });
   });
 });
@@ -225,36 +275,51 @@ describe("When deleting a franchise", () => {
       await expect(result).rejects.toThrowError();
     });
   });
-  describe("and the franchise does not exist", () => {
-    it("should return an error", async () => {
-      // Act
-      const result = await authenticatedCaller.franchise.delete({
-        id: createId(),
-      });
+  describe("and the user is authenticated", () => {
+    describe("and the user is not an admin", () => {
+      it("should throw an error", async () => {
+        // Act
+        const result = authenticatedCaller.franchise.delete({
+          id: createId(),
+        });
 
-      // Assert
-      expect(result.ok).toBe(false);
+        // Assert
+        await expect(result).rejects.toThrowError();
+      });
     });
-  });
-  describe("and the franchise exists", () => {
-    it("should delete the franchise", async () => {
-      // Arrange
-      const data = await prisma.franchise.create({
-        data: {
-          name: faker.company.name(),
-          description: faker.company.catchPhrase(),
-          backgroundImage: faker.image.url(),
-        },
-      });
+    describe("and the user is an admin", () => {
+      describe("and the franchise does not exist", () => {
+        it("should return an error", async () => {
+          // Act
+          const result = await adminCaller.franchise.delete({
+            id: createId(),
+          });
 
-      // Act
-      const result = await authenticatedCaller.franchise.delete({
-        id: data.id,
+          // Assert
+          expect(result.ok).toBe(false);
+        });
       });
+      describe("and the franchise exists", () => {
+        it("should delete the franchise", async () => {
+          // Arrange
+          const data = await prisma.franchise.create({
+            data: {
+              name: faker.company.name(),
+              description: faker.company.catchPhrase(),
+              backgroundImage: faker.image.url(),
+            },
+          });
 
-      // Assert
-      expect(result.ok).toBe(true);
-      expect(result.val).toMatchObject(data);
+          // Act
+          const result = await adminCaller.franchise.delete({
+            id: data.id,
+          });
+
+          // Assert
+          expect(result.ok).toBe(true);
+          expect(result.val).toMatchObject(data);
+        });
+      });
     });
   });
 });
