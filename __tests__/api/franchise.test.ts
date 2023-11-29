@@ -18,6 +18,13 @@ afterEach(() => {
 });
 
 const mockUser: User = {
+  role: "User",
+  id: createId(),
+  name: faker.person.firstName(),
+};
+
+const mockAdmin: User = {
+  role: "Admin",
   id: createId(),
   name: faker.person.firstName(),
 };
@@ -25,6 +32,11 @@ const mockUser: User = {
 const mockUserSession: Session = {
   expires: new Date().toISOString(),
   user: mockUser,
+};
+
+const mockAdminSession: Session = {
+  expires: new Date().toISOString(),
+  user: mockAdmin,
 };
 
 describe("When creating a franchise", () => {
@@ -47,35 +59,55 @@ describe("When creating a franchise", () => {
     });
   });
   describe("and the user is authenticated", () => {
-    it("should create the franchise", async () => {
-      // Arrange
-      const caller = appRouter.createCaller({
-        prisma: mockCtx.prisma,
-        session: mockUserSession,
+    describe("and the user is not an admin", () => {
+      it("should throw an error", async () => {
+        // Arrange
+        const caller = appRouter.createCaller({
+          prisma: mockCtx.prisma,
+          session: mockUserSession,
+        });
+
+        // Act + Expect
+        await expect(() =>
+          caller.franchise.create({
+            name: faker.company.name(),
+            backgroundImage: faker.image.url(),
+            description: faker.lorem.words(),
+          })
+        ).rejects.toThrow();
       });
+    });
+    describe("and the user is an admin", () => {
+      it("should create the franchise", async () => {
+        // Arrange
+        const caller = appRouter.createCaller({
+          prisma: mockCtx.prisma,
+          session: mockAdminSession,
+        });
 
-      const expectedCreated: z.infer<typeof createFranchiseSchema> & {
-        id: string;
-      } = {
-        name: faker.company.name(),
-        id: createId(),
-        backgroundImage: faker.image.url(),
-        description: faker.lorem.words(),
-      };
-      mockCtx.prisma.franchise.create.mockResolvedValue(expectedCreated);
+        const expectedCreated: z.infer<typeof createFranchiseSchema> & {
+          id: string;
+        } = {
+          name: faker.company.name(),
+          id: createId(),
+          backgroundImage: faker.image.url(),
+          description: faker.lorem.words(),
+        };
+        mockCtx.prisma.franchise.create.mockResolvedValue(expectedCreated);
 
-      // Act
-      const result = await caller.franchise.create(expectedCreated);
+        // Act
+        const result = await caller.franchise.create(expectedCreated);
 
-      // Assert
-      expect(result.ok).toBe(true);
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(mockCtx.prisma.franchise.create).toHaveBeenCalledWith({
-        data: {
-          name: expectedCreated.name,
-          description: expectedCreated.description,
-          backgroundImage: expectedCreated.backgroundImage,
-        },
+        // Assert
+        expect(result.ok).toBe(true);
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        expect(mockCtx.prisma.franchise.create).toHaveBeenCalledWith({
+          data: {
+            name: expectedCreated.name,
+            description: expectedCreated.description,
+            backgroundImage: expectedCreated.backgroundImage,
+          },
+        });
       });
     });
   });
@@ -211,75 +243,96 @@ describe("When updating a franchise", () => {
   });
 
   describe("and the user is authenticated", () => {
-    describe("and the franchise does not exist", () => {
-      it("should return an error", async () => {
+    describe("and the user is not an admin", () => {
+      it("should throw an error", async () => {
         // Arrange
-        mockCtx.prisma.franchise.update.mockRejectedValue(
-          new Prisma.PrismaClientKnownRequestError("Record Not Found", {
-            code: "P2025",
-            clientVersion: "2.30.0",
-          })
-        );
-
         const caller = appRouter.createCaller({
           prisma: mockCtx.prisma,
           session: mockUserSession,
         });
 
-        //Act
-        const result = await caller.franchise.update({
-          name: faker.company.name(),
-          id: createId(),
-          backgroundImage: faker.image.url(),
-          description: faker.lorem.words(),
-        });
-
-        //Assert
-        expect(result.ok).toBe(false);
+        // Act + Expect
+        await expect(() =>
+          caller.franchise.update({
+            name: faker.company.name(),
+            id: createId(),
+            backgroundImage: faker.image.url(),
+            description: faker.lorem.words(),
+          })
+        ).rejects.toThrow();
       });
     });
-    describe("and the franchise exists", () => {
-      it("should update the franchise", async () => {
-        // Arrange
-        const franchise: Franchise = {
-          name: faker.company.name(),
-          id: createId(),
-          backgroundImage: faker.image.url(),
-          description: faker.lorem.words(),
-        };
+    describe("and the user is an admin", () => {
+      describe("and the franchise does not exist", () => {
+        it("should return an error", async () => {
+          // Arrange
+          mockCtx.prisma.franchise.update.mockRejectedValue(
+            new Prisma.PrismaClientKnownRequestError("Record Not Found", {
+              code: "P2025",
+              clientVersion: "2.30.0",
+            })
+          );
 
-        mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
+          const caller = appRouter.createCaller({
+            prisma: mockCtx.prisma,
+            session: mockAdminSession,
+          });
 
-        const expectedUpdated: Franchise = {
-          id: franchise.id,
-          name: faker.company.name(),
-          backgroundImage: faker.image.url(),
-          description: faker.lorem.words(),
-        };
+          //Act
+          const result = await caller.franchise.update({
+            name: faker.company.name(),
+            id: createId(),
+            backgroundImage: faker.image.url(),
+            description: faker.lorem.words(),
+          });
 
-        mockCtx.prisma.franchise.update.mockResolvedValue(expectedUpdated);
-
-        const caller = appRouter.createCaller({
-          prisma: mockCtx.prisma,
-          session: mockUserSession,
+          //Assert
+          expect(result.ok).toBe(false);
         });
+      });
+      describe("and the franchise exists", () => {
+        it("should update the franchise", async () => {
+          // Arrange
+          const franchise: Franchise = {
+            name: faker.company.name(),
+            id: createId(),
+            backgroundImage: faker.image.url(),
+            description: faker.lorem.words(),
+          };
 
-        // Act
-        const result = await caller.franchise.update(expectedUpdated);
+          mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
 
-        // Assert
-        expect(result.ok).toBe(true);
-        expect(result.val).toMatchObject(expectedUpdated);
-        // eslint-disable-next-line @typescript-eslint/unbound-method
-        expect(mockCtx.prisma.franchise.update).toHaveBeenCalledWith({
-          data: {
-            name: expectedUpdated.name,
-            description: expectedUpdated.description,
-            backgroundImage: expectedUpdated.backgroundImage,
-          },
-          where: {
+          const expectedUpdated: Franchise = {
             id: franchise.id,
-          },
+            name: faker.company.name(),
+            backgroundImage: faker.image.url(),
+            description: faker.lorem.words(),
+          };
+
+          mockCtx.prisma.franchise.update.mockResolvedValue(expectedUpdated);
+
+          const caller = appRouter.createCaller({
+            prisma: mockCtx.prisma,
+            session: mockAdminSession,
+          });
+
+          // Act
+          const result = await caller.franchise.update(expectedUpdated);
+
+          // Assert
+          expect(result.ok).toBe(true);
+          expect(result.val).toMatchObject(expectedUpdated);
+          // eslint-disable-next-line @typescript-eslint/unbound-method
+          expect(mockCtx.prisma.franchise.update).toHaveBeenCalledWith({
+            data: {
+              name: expectedUpdated.name,
+              description: expectedUpdated.description,
+              backgroundImage: expectedUpdated.backgroundImage,
+            },
+            where: {
+              id: franchise.id,
+            },
+          });
         });
       });
     });
@@ -304,72 +357,90 @@ describe("When deleting a franchise", () => {
     });
   });
   describe("and the user is authenticated", () => {
-    describe("and the franchise does not exist", () => {
-      it("should return an error", async () => {
+    describe("and the user is not an admin", () => {
+      it("should throw an error", async () => {
         // Arrange
-        // mockCtx.prisma.franchise.findUnique.mockResolvedValue(null);
-
-        mockCtx.prisma.franchise.delete.mockRejectedValue(
-          new Prisma.PrismaClientKnownRequestError("Record Not Found", {
-            code: "P2025",
-            clientVersion: "2.30.0",
-          })
-        );
-
         const caller = appRouter.createCaller({
           prisma: mockCtx.prisma,
           session: mockUserSession,
         });
 
-        // Act
-        const result = await caller.franchise.delete({
-          id: createId(),
-        });
-
-        // Assert
-        expect(result.ok).toBe(false);
+        // Act + Expect
+        await expect(() =>
+          caller.franchise.delete({
+            id: createId(),
+          })
+        ).rejects.toThrow();
       });
     });
+    describe("and the user is an admin", () => {
+      describe("and the franchise does not exist", () => {
+        it("should return an error", async () => {
+          // Arrange
+          // mockCtx.prisma.franchise.findUnique.mockResolvedValue(null);
 
-    describe("and the franchise exists", () => {
-      it("should delete the franchise", async () => {
-        // Arrange
-        const franchise: Franchise = {
-          id: createId(),
-          name: faker.company.name(),
-          backgroundImage: faker.image.url(),
-          description: faker.lorem.words(),
-        };
+          mockCtx.prisma.franchise.delete.mockRejectedValue(
+            new Prisma.PrismaClientKnownRequestError("Record Not Found", {
+              code: "P2025",
+              clientVersion: "2.30.0",
+            })
+          );
 
-        mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
+          const caller = appRouter.createCaller({
+            prisma: mockCtx.prisma,
+            session: mockAdminSession,
+          });
 
-        const expectedDeleted: Franchise = {
-          id: createId(),
-          name: faker.company.name(),
-          backgroundImage: faker.image.url(),
-          description: faker.lorem.words(),
-        };
+          // Act
+          const result = await caller.franchise.delete({
+            id: createId(),
+          });
 
-        mockCtx.prisma.franchise.delete.mockResolvedValue(expectedDeleted);
-
-        const caller = appRouter.createCaller({
-          prisma: mockCtx.prisma,
-          session: mockUserSession,
+          // Assert
+          expect(result.ok).toBe(false);
         });
+      });
 
-        // Act
-        const result = await caller.franchise.delete({
-          id: franchise.id,
-        });
+      describe("and the franchise exists", () => {
+        it("should delete the franchise", async () => {
+          // Arrange
+          const franchise: Franchise = {
+            id: createId(),
+            name: faker.company.name(),
+            backgroundImage: faker.image.url(),
+            description: faker.lorem.words(),
+          };
 
-        // Assert
-        expect(result.ok).toBe(true);
-        expect(result.val).toMatchObject(expectedDeleted);
-        // eslint-disable-next-line @typescript-eslint/unbound-method
-        expect(mockCtx.prisma.franchise.delete).toHaveBeenCalledWith({
-          where: {
+          mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
+
+          const expectedDeleted: Franchise = {
+            id: createId(),
+            name: faker.company.name(),
+            backgroundImage: faker.image.url(),
+            description: faker.lorem.words(),
+          };
+
+          mockCtx.prisma.franchise.delete.mockResolvedValue(expectedDeleted);
+
+          const caller = appRouter.createCaller({
+            prisma: mockCtx.prisma,
+            session: mockAdminSession,
+          });
+
+          // Act
+          const result = await caller.franchise.delete({
             id: franchise.id,
-          },
+          });
+
+          // Assert
+          expect(result.ok).toBe(true);
+          expect(result.val).toMatchObject(expectedDeleted);
+          // eslint-disable-next-line @typescript-eslint/unbound-method
+          expect(mockCtx.prisma.franchise.delete).toHaveBeenCalledWith({
+            where: {
+              id: franchise.id,
+            },
+          });
         });
       });
     });

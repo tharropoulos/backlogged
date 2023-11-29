@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
+  adminProcedure,
   createTRPCRouter,
-  protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
 
@@ -51,7 +51,7 @@ export const franchiseRouter = createTRPCRouter({
       return result;
     }),
 
-  delete: protectedProcedure
+  delete: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
       const result: Result<Franchise, TRPCError> = await ctx.prisma.franchise
@@ -63,7 +63,7 @@ export const franchiseRouter = createTRPCRouter({
       return result;
     }),
 
-  create: protectedProcedure
+  create: adminProcedure
     .input(createFranchiseSchema)
     .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
       const franchise: Result<Franchise, TRPCError> = await ctx.prisma.franchise
@@ -79,7 +79,7 @@ export const franchiseRouter = createTRPCRouter({
       return franchise;
     }),
 
-  update: protectedProcedure
+  update: adminProcedure
     .input(updateFranchiseSchema)
     .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
       const result: Result<Franchise, TRPCError> = await ctx.prisma.franchise
