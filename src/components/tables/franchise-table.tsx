@@ -14,8 +14,8 @@ export const FranchiseTable = () => {
   const { data, isLoading } = api.franchise.getAll.useQuery();
 
   if (isLoading) return <div>Loading...</div>;
-  if (!data) return <div>Something went wrong</div>;
-  if (data.length === 0) return <div>No franchises found</div>;
+  if (!data || !data.ok) return <div>Something went wrong</div>;
+  if (data.val.length === 0) return <div>No franchises found</div>;
   console.log(data);
 
   return (
@@ -29,7 +29,7 @@ export const FranchiseTable = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((franchise) => (
+        {data.val.map((franchise) => (
           <TableRow key={franchise.id}>
             <TableCell>{franchise.name}</TableCell>
             <TableCell>{franchise.description}</TableCell>
