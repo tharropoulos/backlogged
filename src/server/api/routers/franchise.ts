@@ -6,7 +6,10 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
-import { createFranchiseSchema } from "~/lib/validations/franchise";
+import {
+  createFranchiseSchema,
+  updateFranchiseSchema,
+} from "~/lib/validations/franchise";
 import { type Franchise } from "@prisma/client";
 import { type Result, Ok, Err } from "ts-results";
 import { handlePrismaError } from "~/utils";
@@ -77,14 +80,7 @@ export const franchiseRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        name: z.string().min(1).max(255),
-        description: z.string().min(1).max(255),
-        backgroundImage: z.string().min(1).max(255),
-      })
-    )
+    .input(updateFranchiseSchema)
     .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
       const result: Result<Franchise, TRPCError> = await ctx.prisma.franchise
         .update({

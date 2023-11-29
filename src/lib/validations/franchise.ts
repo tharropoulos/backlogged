@@ -9,3 +9,7 @@ export const createFranchiseSchema = z.object({
     .max(255),
   backgroundImage: z.string().min(1).max(255),
 });
+
+export const updateFranchiseSchema = createFranchiseSchema.extend({
+  id: z.string().cuid2(),
+});
