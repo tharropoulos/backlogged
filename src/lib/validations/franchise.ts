@@ -7,7 +7,7 @@ export const createFranchiseSchema = z.object({
     .min(1, { message: "A description is required" })
 
     .max(255),
-  backgroundImage: z.string().min(1).max(255),
+  image: z.string().min(1).max(255),
 });
 
 export const updateFranchiseSchema = createFranchiseSchema.extend({

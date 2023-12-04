@@ -71,7 +71,7 @@ export const franchiseRouter = createTRPCRouter({
           data: {
             name: input.name,
             description: input.description,
-            backgroundImage: input.backgroundImage,
+            image: input.image,
           },
         })
         .then((res) => Ok(res), handlePrismaError);
@@ -90,7 +90,7 @@ export const franchiseRouter = createTRPCRouter({
           data: {
             name: input.name,
             description: input.description,
-            backgroundImage: input.backgroundImage,
+            image: input.image,
           },
         })
         .then((res) => Ok(res), handlePrismaError);

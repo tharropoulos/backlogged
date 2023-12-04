@@ -104,7 +104,7 @@ model Publisher {
     id          String @id @default(cuid())
     name        String @db.VarChar(191)
     description String @db.VarChar(191)
-    coverImage  String @map("cover_image") @db.VarChar(191)
+    image       String @map("image") @db.VarChar(191)
     games       Game[]
 }
 
@@ -112,7 +112,7 @@ model Feature {
     id          String @id @default(cuid())
     name        String @db.VarChar(191)
     description String @db.VarChar(191)
-    coverImage  String @map("cover_image") @db.VarChar(191)
+    image       String @map("image") @db.VarChar(191)
     games       Game[]
 }
 
@@ -120,7 +120,7 @@ model Platform {
     id          String           @id @default(cuid())
     name        String           @db.VarChar(192)
     description String           @db.VarChar(191)
-    coverImage  String           @map("cover_image") @db.VarChar(191)
+    image       String           @map("image") @db.VarChar(191)
     games       GameToPlatform[]
 }
 
@@ -141,7 +141,7 @@ model Developer {
     id          String @id @default(cuid())
     name        String @db.VarChar(191)
     description String @db.VarChar(191)
-    coverImage  String @map("cover_image") @db.VarChar(191)
+    image       String @map("image") @db.VarChar(191)
     games       Game[]
 }
 
@@ -153,11 +153,11 @@ model Genre {
 }
 
 model Franchise {
-    id              String @id @default(cuid())
-    name            String @db.VarChar(191)
-    description     String @db.VarChar(191)
-    backgroundImage String @map("background_image") @db.VarChar(191)
-    games           Game[]
+    id          String @id @default(cuid())
+    name        String @db.VarChar(191)
+    description String @db.VarChar(191)
+    image       String @map("image") @db.VarChar(191)
+    games       Game[]
 }
 
 // Necessary for Next auth

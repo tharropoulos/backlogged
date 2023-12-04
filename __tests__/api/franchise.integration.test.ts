@@ -11,9 +11,8 @@ import { type z } from "zod";
 import { type createFranchiseSchema } from "~/lib/validations/franchise";
 
 afterAll(async () => {
-  const deleteFranchises = prisma.franchise.deleteMany();
-  await prisma.$transaction([deleteFranchises]);
-  await prisma.$disconnect();
+  const franchises = prisma.franchise.deleteMany();
+  await prisma.$transaction([franchises]);
 });
 
 const mockUser: User = {
@@ -63,7 +62,7 @@ describe("When creating a franchise", () => {
       const result = unauthenticatedCaller.franchise.create({
         name: faker.company.name(),
         description: faker.company.catchPhrase(),
-        backgroundImage: faker.image.url(),
+        image: faker.image.url(),
       });
 
       // Assert
@@ -77,7 +76,7 @@ describe("When creating a franchise", () => {
         const result = authenticatedCaller.franchise.create({
           name: faker.company.name(),
           description: faker.company.catchPhrase(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
         });
 
         // Assert
@@ -90,7 +89,7 @@ describe("When creating a franchise", () => {
         const franchise: z.infer<typeof createFranchiseSchema> = {
           name: faker.company.name(),
           description: faker.company.catchPhrase(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
         };
 
         // Act
@@ -122,7 +121,7 @@ describe("When retrieving a franchise by Id", () => {
       // Arrange
       const data = await prisma.franchise.create({
         data: {
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
           description: faker.company.catchPhrase(),
           name: faker.company.name(),
         },
@@ -162,12 +161,12 @@ describe("When retrieving all franchises", () => {
         {
           name: faker.company.name(),
           description: faker.company.catchPhrase(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
         },
         {
           name: faker.company.name(),
           description: faker.company.catchPhrase(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
         },
       ];
 
@@ -198,7 +197,7 @@ describe("When updating a franchise", () => {
         id: createId(),
         name: faker.company.name(),
         description: faker.company.catchPhrase(),
-        backgroundImage: faker.image.url(),
+        image: faker.image.url(),
       });
 
       // Assert
@@ -213,7 +212,7 @@ describe("When updating a franchise", () => {
           id: createId(),
           name: faker.company.name(),
           description: faker.company.catchPhrase(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
         });
 
         // Assert
@@ -228,7 +227,7 @@ describe("When updating a franchise", () => {
             id: createId(),
             name: faker.company.name(),
             description: faker.company.catchPhrase(),
-            backgroundImage: faker.image.url(),
+            image: faker.image.url(),
           });
 
           // Assert
@@ -242,7 +241,7 @@ describe("When updating a franchise", () => {
             data: {
               name: faker.company.name(),
               description: faker.company.catchPhrase(),
-              backgroundImage: faker.image.url(),
+              image: faker.image.url(),
             },
           });
 
@@ -250,7 +249,7 @@ describe("When updating a franchise", () => {
             id: data.id,
             name: faker.company.name(),
             description: faker.company.catchPhrase(),
-            backgroundImage: faker.image.url(),
+            image: faker.image.url(),
           };
 
           // Act
@@ -306,7 +305,7 @@ describe("When deleting a franchise", () => {
             data: {
               name: faker.company.name(),
               description: faker.company.catchPhrase(),
-              backgroundImage: faker.image.url(),
+              image: faker.image.url(),
             },
           });
 

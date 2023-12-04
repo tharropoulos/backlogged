@@ -52,7 +52,7 @@ describe("When creating a franchise", () => {
       await expect(() =>
         caller.franchise.create({
           name: faker.company.name(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
           description: faker.lorem.words(),
         })
       ).rejects.toThrow();
@@ -71,7 +71,7 @@ describe("When creating a franchise", () => {
         await expect(() =>
           caller.franchise.create({
             name: faker.company.name(),
-            backgroundImage: faker.image.url(),
+            image: faker.image.url(),
             description: faker.lorem.words(),
           })
         ).rejects.toThrow();
@@ -90,7 +90,7 @@ describe("When creating a franchise", () => {
         } = {
           name: faker.company.name(),
           id: createId(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
           description: faker.lorem.words(),
         };
         mockCtx.prisma.franchise.create.mockResolvedValue(expectedCreated);
@@ -105,7 +105,7 @@ describe("When creating a franchise", () => {
           data: {
             name: expectedCreated.name,
             description: expectedCreated.description,
-            backgroundImage: expectedCreated.backgroundImage,
+            image: expectedCreated.image,
           },
         });
       });
@@ -142,13 +142,13 @@ describe("When retrieving all franchises", () => {
           id: createId(),
           name: faker.company.name(),
           description: faker.lorem.words(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
         },
         {
           id: createId(),
           name: faker.company.name(),
           description: faker.lorem.words(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
         },
       ];
 
@@ -194,7 +194,7 @@ describe("When retrieving a franchise by Id", () => {
       const franchise: Franchise = {
         name: faker.company.name(),
         id: createId(),
-        backgroundImage: faker.image.url(),
+        image: faker.image.url(),
         description: faker.lorem.words(),
       };
 
@@ -235,7 +235,7 @@ describe("When updating a franchise", () => {
         caller.franchise.update({
           name: faker.company.name(),
           id: createId(),
-          backgroundImage: faker.image.url(),
+          image: faker.image.url(),
           description: faker.lorem.words(),
         })
       ).rejects.toThrow();
@@ -256,7 +256,7 @@ describe("When updating a franchise", () => {
           caller.franchise.update({
             name: faker.company.name(),
             id: createId(),
-            backgroundImage: faker.image.url(),
+            image: faker.image.url(),
             description: faker.lorem.words(),
           })
         ).rejects.toThrow();
@@ -282,7 +282,7 @@ describe("When updating a franchise", () => {
           const result = await caller.franchise.update({
             name: faker.company.name(),
             id: createId(),
-            backgroundImage: faker.image.url(),
+            image: faker.image.url(),
             description: faker.lorem.words(),
           });
 
@@ -296,7 +296,7 @@ describe("When updating a franchise", () => {
           const franchise: Franchise = {
             name: faker.company.name(),
             id: createId(),
-            backgroundImage: faker.image.url(),
+            image: faker.image.url(),
             description: faker.lorem.words(),
           };
 
@@ -305,7 +305,7 @@ describe("When updating a franchise", () => {
           const expectedUpdated: Franchise = {
             id: franchise.id,
             name: faker.company.name(),
-            backgroundImage: faker.image.url(),
+            image: faker.image.url(),
             description: faker.lorem.words(),
           };
 
@@ -326,8 +326,9 @@ describe("When updating a franchise", () => {
           expect(mockCtx.prisma.franchise.update).toHaveBeenCalledWith({
             data: {
               name: expectedUpdated.name,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              image: expectedUpdated.image,
               description: expectedUpdated.description,
-              backgroundImage: expectedUpdated.backgroundImage,
             },
             where: {
               id: franchise.id,
@@ -407,7 +408,7 @@ describe("When deleting a franchise", () => {
           const franchise: Franchise = {
             id: createId(),
             name: faker.company.name(),
-            backgroundImage: faker.image.url(),
+            image: faker.image.url(),
             description: faker.lorem.words(),
           };
 
@@ -416,7 +417,7 @@ describe("When deleting a franchise", () => {
           const expectedDeleted: Franchise = {
             id: createId(),
             name: faker.company.name(),
-            backgroundImage: faker.image.url(),
+            image: faker.image.url(),
             description: faker.lorem.words(),
           };
 
