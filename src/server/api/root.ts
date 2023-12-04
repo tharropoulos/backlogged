@@ -1,5 +1,6 @@
 import { createTRPCRouter } from "~/server/api/trpc";
 import { franchiseRouter } from "./routers/franchise";
+import { publisherRouter } from "./routers/publisher";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { franchiseRouter } from "./routers/franchise";
  */
 export const appRouter = createTRPCRouter({
   franchise: franchiseRouter,
+  publisher: publisherRouter,
 });
 
 // export type definition of API
