@@ -4,6 +4,7 @@ import { publisherRouter } from "./routers/publisher";
 import { developerRouter } from "./routers/developer";
 import { featureRouter } from "./routers/feature";
 import { genreRouter } from "./routers/genre";
+import { platformRouter } from "./routers/platform";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   developer: developerRouter,
   feature: featureRouter,
   genre: genreRouter,
+  platform: platformRouter,
 });
 
 // export type definition of API
