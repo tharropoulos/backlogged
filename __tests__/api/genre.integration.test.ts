@@ -6,7 +6,7 @@ import { faker } from "@faker-js/faker";
 import { createId } from "@paralleldrive/cuid2";
 import type { Session } from "next-auth";
 import type { User } from "next-auth";
-import type { Genre } from "@prisma/client";
+import type { Game, Genre } from "@prisma/client";
 import type { z } from "zod";
 import type { createGenreSchema } from "~/lib/validations/genre";
 
@@ -385,37 +385,67 @@ describe("When retrieving games of a genre", () => {
           },
         });
 
+        // REVISION_2: create games before connecting them with genre
+        const game1: Game = await prisma.game.create({
+          data: {
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            coverImage: faker.image.url(),
+            backgroundImage: faker.image.url(),
+            releaseDate: new Date(),
+            // franchiseId: createId(),
+            // publisherId: createId(),
+            franchise: {
+              connect: {
+                id: franchise.id,
+              },
+            },
+            publisher: {
+              connect: {
+                id: publisher.id,
+              },
+            },
+          },
+        });
+
+        const game2: Game = await prisma.game.create({
+          data: {
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            coverImage: faker.image.url(),
+            backgroundImage: faker.image.url(),
+            releaseDate: new Date(),
+            // franchiseId: createId(),
+            // publisherId: createId(),
+            franchise: {
+              connect: {
+                id: franchise.id,
+              },
+            },
+            publisher: {
+              connect: {
+                id: publisher.id,
+              },
+            },
+          },
+        });
+        const games: Array<Game> = [game1, game2];
+        // END_REVISION_2
+
+        // REVISION_3: correctly connect games to genre
         const genre = await prisma.genre.create({
           data: {
             name: faker.company.name(),
             description: faker.company.catchPhrase(),
             games: {
-              create: [
-                {
-                  name: faker.company.name(),
-                  description: faker.company.catchPhrase(),
-                  coverImage: faker.image.url(),
-                  backgroundImage: faker.image.url(),
-                  releaseDate: faker.date.past(),
-                  franchiseId: franchise.id,
-                  publisherId: publisher.id,
-                },
-                {
-                  name: faker.company.name(),
-                  description: faker.company.catchPhrase(),
-                  coverImage: faker.image.url(),
-                  backgroundImage: faker.image.url(),
-                  releaseDate: faker.date.past(),
-                  franchiseId: franchise.id,
-                  publisherId: publisher.id,
-                },
-              ],
+              connect: games.map((game) => ({ id: game.id })),
             },
           },
           include: {
             games: true,
           },
         });
+        // END_REVISION_3
 
         // Act
         const result = await authenticatedCaller.genre.getGames({
@@ -508,6 +538,24 @@ describe("When adding games to a genre", () => {
         describe("and the games exist", () => {
           it("should add the games to the genre", async () => {
             // Arrange
+            // REVISION_4: create franchise and publisher before creating games
+            const franchise = await prisma.franchise.create({
+              data: {
+                name: faker.company.name(),
+                description: faker.company.catchPhrase(),
+                image: faker.image.url(),
+              },
+            });
+
+            const publisher = await prisma.publisher.create({
+              data: {
+                name: faker.company.name(),
+                description: faker.company.catchPhrase(),
+                image: faker.image.url(),
+              },
+            });
+            // END_REVISION_4
+
             const genre = await prisma.genre.create({
               data: {
                 name: faker.company.name(),
@@ -515,6 +563,7 @@ describe("When adding games to a genre", () => {
               },
             });
 
+            // REVISION_2: create games before connecting them with genre
             const game1 = await prisma.game.create({
               data: {
                 name: faker.company.name(),
@@ -522,8 +571,18 @@ describe("When adding games to a genre", () => {
                 coverImage: faker.image.url(),
                 backgroundImage: faker.image.url(),
                 releaseDate: new Date(),
-                franchiseId: createId(),
-                publisherId: createId(),
+                // franchiseId: createId(),
+                // publisherId: createId(),
+                franchise: {
+                  connect: {
+                    id: franchise.id,
+                  },
+                },
+                publisher: {
+                  connect: {
+                    id: publisher.id,
+                  },
+                },
               },
             });
 
@@ -534,10 +593,21 @@ describe("When adding games to a genre", () => {
                 coverImage: faker.image.url(),
                 backgroundImage: faker.image.url(),
                 releaseDate: new Date(),
-                franchiseId: createId(),
-                publisherId: createId(),
+                // franchiseId: createId(),
+                // publisherId: createId(),
+                franchise: {
+                  connect: {
+                    id: franchise.id,
+                  },
+                },
+                publisher: {
+                  connect: {
+                    id: publisher.id,
+                  },
+                },
               },
             });
+            // END_REVISION_2
 
             // Act
             const result = await adminCaller.genre.addGames({
@@ -643,6 +713,24 @@ describe("When removing games from a genre", () => {
           describe("and the games do not belong to the genre", () => {
             it("shouldn't do anything", async () => {
               // Arrange
+              // REVISION_4: create franchise and publisher before creating games
+              const franchise = await prisma.franchise.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+
+              const publisher = await prisma.publisher.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+              // END_REVISION_4
+
               const genre = await prisma.genre.create({
                 data: {
                   name: faker.company.name(),
@@ -657,8 +745,18 @@ describe("When removing games from a genre", () => {
                   coverImage: faker.image.url(),
                   backgroundImage: faker.image.url(),
                   releaseDate: faker.date.past(),
-                  franchiseId: createId(),
-                  publisherId: createId(),
+                  // franchiseId: createId(),
+                  // publisherId: createId(),
+                  franchise: {
+                    connect: {
+                      id: franchise.id,
+                    },
+                  },
+                  publisher: {
+                    connect: {
+                      id: publisher.id,
+                    },
+                  },
                 },
               });
 
@@ -683,6 +781,23 @@ describe("When removing games from a genre", () => {
           describe("and the games belong to the genre", () => {
             it("should remove the games successfully", async () => {
               // Arrange
+              // REVISION_4: create franchise and publisher before creating games
+              const franchise = await prisma.franchise.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+
+              const publisher = await prisma.publisher.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+              // END_REVISION_4
               const genre = await prisma.genre.create({
                 data: {
                   name: faker.company.name(),
@@ -690,6 +805,7 @@ describe("When removing games from a genre", () => {
                 },
               });
 
+              // REVISION_2: create games before connecting them with genre
               const game = await prisma.game.create({
                 data: {
                   name: faker.company.name(),
@@ -697,8 +813,18 @@ describe("When removing games from a genre", () => {
                   coverImage: faker.image.url(),
                   backgroundImage: faker.image.url(),
                   releaseDate: faker.date.past(),
-                  franchiseId: createId(),
-                  publisherId: createId(),
+                  // franchiseId: createId(),
+                  // publisherId: createId(),
+                  franchise: {
+                    connect: {
+                      id: franchise.id,
+                    },
+                  },
+                  publisher: {
+                    connect: {
+                      id: publisher.id,
+                    },
+                  },
                   genres: {
                     connect: {
                       id: genre.id,
@@ -706,6 +832,7 @@ describe("When removing games from a genre", () => {
                   },
                 },
               });
+              // END_REVISION_2
 
               // Act
               const result = await adminCaller.genre.removeGames({

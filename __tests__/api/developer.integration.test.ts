@@ -6,7 +6,7 @@ import { appRouter } from "~/server/api/root";
 import { prisma } from "~/server/db";
 import { faker } from "@faker-js/faker";
 import { createId } from "@paralleldrive/cuid2";
-import { type Developer } from "@prisma/client";
+import { Game, type Developer } from "@prisma/client";
 import { type z } from "zod";
 import { type createDeveloperSchema } from "~/lib/validations/developer";
 
@@ -390,39 +390,70 @@ describe("When retrieving games of a developer", () => {
             image: faker.image.url(),
           },
         });
+        // REVISION_5: create games before connecting them with developer
+        const game1: Game = await prisma.game.create({
+          data: {
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            coverImage: faker.image.url(),
+            backgroundImage: faker.image.url(),
+            releaseDate: new Date(),
+            // franchiseId: createId(),
+            // publisherId: createId(),
+            franchise: {
+              connect: {
+                id: franchise.id,
+              },
+            },
+            publisher: {
+              connect: {
+                id: publisher.id,
+              },
+            },
+          },
+        });
 
+        const game2: Game = await prisma.game.create({
+          data: {
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            coverImage: faker.image.url(),
+            backgroundImage: faker.image.url(),
+            releaseDate: new Date(),
+            // franchiseId: createId(),
+            // publisherId: createId(),
+            franchise: {
+              connect: {
+                id: franchise.id,
+              },
+            },
+            publisher: {
+              connect: {
+                id: publisher.id,
+              },
+            },
+          },
+        });
+        const games: Array<Game> = [game1, game2];
+        // END_REVISION_5
+
+        // REVISION_4: correctly connect games to franchises and publishers
         const developer = await prisma.developer.create({
           data: {
             name: faker.company.name(),
             description: faker.company.catchPhrase(),
             image: faker.image.url(),
             games: {
-              create: [
-                {
-                  name: faker.company.name(),
-                  description: faker.company.catchPhrase(),
-                  coverImage: faker.image.url(),
-                  backgroundImage: faker.image.url(),
-                  releaseDate: faker.date.past(),
-                  franchiseId: franchise.id,
-                  publisherId: publisher.id,
-                },
-                {
-                  name: faker.company.name(),
-                  description: faker.company.catchPhrase(),
-                  coverImage: faker.image.url(),
-                  backgroundImage: faker.image.url(),
-                  releaseDate: faker.date.past(),
-                  franchiseId: franchise.id,
-                  publisherId: publisher.id,
-                },
-              ],
+              connect: games.map((game) => ({
+                id: game.id,
+              })),
             },
           },
           include: {
             games: true,
           },
         });
+        // END_REVISION_4
 
         // Act
         // REWRITE_2: use unauthenticated caller
@@ -489,6 +520,24 @@ describe("When adding games to a developer", () => {
     describe("and the games exist", () => {
       it("should add the games to the developer", async () => {
         // Arrange
+        // REVISION_3: create franchises and publishers
+        const franchise = await prisma.franchise.create({
+          data: {
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            image: faker.image.url(),
+          },
+        });
+
+        const publisher = await prisma.publisher.create({
+          data: {
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            image: faker.image.url(),
+          },
+        });
+        // END_REVISION_3
+
         const developer = await prisma.developer.create({
           data: {
             name: faker.company.name(),
@@ -497,6 +546,7 @@ describe("When adding games to a developer", () => {
           },
         });
 
+        // REVISION_4: correctly connect games to franchises and publishers
         const game1 = await prisma.game.create({
           data: {
             name: faker.company.name(),
@@ -504,8 +554,18 @@ describe("When adding games to a developer", () => {
             coverImage: faker.image.url(),
             backgroundImage: faker.image.url(),
             releaseDate: new Date(),
-            franchiseId: createId(),
-            publisherId: createId(),
+            // franchiseId: createId(),
+            // publisherId: createId(),
+            franchise: {
+              connect: {
+                id: franchise.id,
+              },
+            },
+            publisher: {
+              connect: {
+                id: publisher.id,
+              },
+            },
           },
         });
 
@@ -516,10 +576,21 @@ describe("When adding games to a developer", () => {
             coverImage: faker.image.url(),
             backgroundImage: faker.image.url(),
             releaseDate: new Date(),
-            franchiseId: createId(),
-            publisherId: createId(),
+            // franchiseId: createId(),
+            // publisherId: createId(),
+            franchise: {
+              connect: {
+                id: franchise.id,
+              },
+            },
+            publisher: {
+              connect: {
+                id: publisher.id,
+              },
+            },
           },
         });
+        // END_REVISION_4
 
         // Act
         const result = await adminCaller.developer.addGames({
@@ -602,49 +673,11 @@ describe("When removing games from a developer", () => {
         describe("and the games do not exist", () => {
           it("shouldn't do anything", async () => {
             // Arrange
-
-            const franchise = await prisma.franchise.create({
-              data: {
-                name: faker.company.name(),
-                description: faker.company.catchPhrase(),
-                image: faker.image.url(),
-              },
-            });
-            const publisher = await prisma.publisher.create({
-              data: {
-                name: faker.company.name(),
-                description: faker.company.catchPhrase(),
-                image: faker.image.url(),
-              },
-            });
-
             const developer = await prisma.developer.create({
               data: {
                 name: faker.company.name(),
                 description: faker.company.catchPhrase(),
                 image: faker.image.url(),
-                games: {
-                  create: [
-                    {
-                      name: faker.company.name(),
-                      description: faker.company.catchPhrase(),
-                      coverImage: faker.image.url(),
-                      backgroundImage: faker.image.url(),
-                      releaseDate: new Date(),
-                      franchiseId: franchise.id,
-                      publisherId: publisher.id,
-                    },
-                    {
-                      name: faker.company.name(),
-                      description: faker.company.catchPhrase(),
-                      coverImage: faker.image.url(),
-                      backgroundImage: faker.image.url(),
-                      releaseDate: new Date(),
-                      franchiseId: franchise.id,
-                      publisherId: publisher.id,
-                    },
-                  ],
-                },
               },
             });
 
@@ -662,7 +695,7 @@ describe("When removing games from a developer", () => {
             // BEGIN_NON_COPILOT_CODE
             // The  prisma disconnect function is idempotent, so it should return ok
             expect(result.ok).toBe(true);
-            expect(result.unwrap().games).toHaveLength(2);
+            expect(result.unwrap().games).toHaveLength(0);
             // END_NON_COPILOT_CODE
 
             // BEGIN_COPILOT_CODE
@@ -699,20 +732,33 @@ describe("When removing games from a developer", () => {
                 },
               });
 
+              // REVISION_4: correctly connect games to franchises and publishers
               const game = await prisma.game.create({
                 data: {
                   name: faker.lorem.words(),
-                  franchiseId: franchise.id,
-                  publisherId: publisher.id,
                   backgroundImage: faker.image.url(),
                   coverImage: faker.image.url(),
                   description: faker.lorem.paragraph(),
                   releaseDate: faker.date.past(),
+                  // publisherId: publisher.id,
+                  // franchiseId: franchise.id,
+                  franchise: {
+                    connect: {
+                      id: franchise.id,
+                    },
+                  },
+                  publisher: {
+                    connect: {
+                      id: publisher.id,
+                    },
+                  },
                 },
                 include: {
                   developers: true,
                 },
               });
+              // END_REVISION_4
+
               // Act
               const result = await adminCaller.developer.removeGames({
                 developerId: developer.id,
@@ -755,11 +801,22 @@ describe("When removing games from a developer", () => {
                 },
               });
 
+              // REVISION_4: correctly connect games to franchises and publishers
               const game = await prisma.game.create({
                 data: {
                   name: faker.lorem.words(),
-                  franchiseId: franchise.id,
-                  publisherId: publisher.id,
+                  // franchiseId: franchise.id,
+                  // publisherId: publisher.id,
+                  franchise: {
+                    connect: {
+                      id: franchise.id,
+                    },
+                  },
+                  publisher: {
+                    connect: {
+                      id: publisher.id,
+                    },
+                  },
                   backgroundImage: faker.image.url(),
                   coverImage: faker.image.url(),
                   description: faker.lorem.words(),

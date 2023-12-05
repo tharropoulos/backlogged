@@ -418,30 +418,59 @@ describe("When retrieving games of a feature", () => {
           },
         });
 
+        // REVISION_3: connect games to franchises and publishers correctly.
+        const game1 = await prisma.game.create({
+          data: {
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            coverImage: faker.image.url(),
+            backgroundImage: faker.image.url(),
+            releaseDate: faker.date.past(),
+            publisher: {
+              connect: {
+                id: publisher.id,
+              },
+            },
+            franchise: {
+              connect: {
+                id: franchise.id,
+              },
+            },
+          },
+        });
+
+        const game2 = await prisma.game.create({
+          data: {
+            name: faker.company.name(),
+            description: faker.company.catchPhrase(),
+            coverImage: faker.image.url(),
+            backgroundImage: faker.image.url(),
+            releaseDate: faker.date.past(),
+            publisher: {
+              connect: {
+                id: publisher.id,
+              },
+            },
+            franchise: {
+              connect: {
+                id: franchise.id,
+              },
+            },
+          },
+        });
+
         const feature = await prisma.feature.create({
           data: {
             name: faker.company.name(),
             description: faker.company.catchPhrase(),
             image: faker.image.url(),
             games: {
-              create: [
+              connect: [
                 {
-                  name: faker.company.name(),
-                  description: faker.company.catchPhrase(),
-                  coverImage: faker.image.url(),
-                  backgroundImage: faker.image.url(),
-                  releaseDate: faker.date.past(),
-                  franchiseId: franchise.id,
-                  publisherId: publisher.id,
+                  id: game1.id,
                 },
                 {
-                  name: faker.company.name(),
-                  description: faker.company.catchPhrase(),
-                  coverImage: faker.image.url(),
-                  backgroundImage: faker.image.url(),
-                  releaseDate: faker.date.past(),
-                  franchiseId: franchise.id,
-                  publisherId: publisher.id,
+                  id: game2.id,
                 },
               ],
             },
@@ -450,6 +479,8 @@ describe("When retrieving games of a feature", () => {
             games: true,
           },
         });
+
+        // END_REVISION_3
 
         // Act
         const result = await authenticatedCaller.feature.getGames({
@@ -550,6 +581,24 @@ describe("When adding games to a feature", () => {
           describe("and the games exist", () => {
             it("should add the games to the feature", async () => {
               // Arrange
+              // REVISION_4: create franchises and publishers before creating games
+              const publisher = await prisma.publisher.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+
+              const franchise = await prisma.franchise.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+              // END_REVISION_4
+
               const feature = await prisma.feature.create({
                 data: {
                   name: faker.company.name(),
@@ -558,6 +607,7 @@ describe("When adding games to a feature", () => {
                 },
               });
 
+              // REVISION_3: connect games to franchises and publishers correctly.
               const game1 = await prisma.game.create({
                 data: {
                   name: faker.company.name(),
@@ -565,8 +615,16 @@ describe("When adding games to a feature", () => {
                   coverImage: faker.image.url(),
                   backgroundImage: faker.image.url(),
                   releaseDate: new Date(),
-                  franchiseId: createId(),
-                  publisherId: createId(),
+                  publisher: {
+                    connect: {
+                      id: publisher.id,
+                    },
+                  },
+                  franchise: {
+                    connect: {
+                      id: franchise.id,
+                    },
+                  },
                 },
               });
 
@@ -577,10 +635,20 @@ describe("When adding games to a feature", () => {
                   coverImage: faker.image.url(),
                   backgroundImage: faker.image.url(),
                   releaseDate: new Date(),
-                  franchiseId: createId(),
-                  publisherId: createId(),
+                  publisher: {
+                    connect: {
+                      id: publisher.id,
+                    },
+                  },
+                  franchise: {
+                    connect: {
+                      id: franchise.id,
+                    },
+                  },
                 },
               });
+
+              // END_REVISION_3
 
               // Act
               const result = await adminCaller.feature.addGames({
@@ -690,6 +758,24 @@ describe("When removing games from a feature", () => {
           describe("and the games do not belong to the feature", () => {
             it("shouldn't do anything", async () => {
               // Arrange
+              // REVISION_4: create franchises and publishers before creating games
+              const publisher = await prisma.publisher.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+
+              const franchise = await prisma.franchise.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+
+              // END_REVISION_4
               const feature = await prisma.feature.create({
                 data: {
                   name: faker.company.name(),
@@ -698,6 +784,7 @@ describe("When removing games from a feature", () => {
                 },
               });
 
+              // REVISON_3: connect games to franchises and publishers correctly.
               const game = await prisma.game.create({
                 data: {
                   name: faker.company.name(),
@@ -705,10 +792,19 @@ describe("When removing games from a feature", () => {
                   coverImage: faker.image.url(),
                   backgroundImage: faker.image.url(),
                   releaseDate: faker.date.past(),
-                  franchiseId: createId(),
-                  publisherId: createId(),
+                  franchise: {
+                    connect: {
+                      id: franchise.id,
+                    },
+                  },
+                  publisher: {
+                    connect: {
+                      id: publisher.id,
+                    },
+                  },
                 },
               });
+              // END_REVISION_3
 
               // Act
               const result = await adminCaller.feature.removeGames({
@@ -724,6 +820,24 @@ describe("When removing games from a feature", () => {
           describe("and the games belong to the feature", () => {
             it("should remove the games successfully", async () => {
               // Arrange
+              // REVISION_4: create franchises and publishers before creating games
+              const publisher = await prisma.publisher.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+
+              const franchise = await prisma.franchise.create({
+                data: {
+                  name: faker.company.name(),
+                  description: faker.company.catchPhrase(),
+                  image: faker.image.url(),
+                },
+              });
+
+              // END_REVISION_4
               const feature = await prisma.feature.create({
                 data: {
                   name: faker.company.name(),
@@ -732,6 +846,7 @@ describe("When removing games from a feature", () => {
                 },
               });
 
+              // REVISION_3: connect games to franchises and publishers correctly.
               const game = await prisma.game.create({
                 data: {
                   name: faker.company.name(),
@@ -739,8 +854,16 @@ describe("When removing games from a feature", () => {
                   coverImage: faker.image.url(),
                   backgroundImage: faker.image.url(),
                   releaseDate: faker.date.past(),
-                  franchiseId: createId(),
-                  publisherId: createId(),
+                  publisher: {
+                    connect: {
+                      id: publisher.id,
+                    },
+                  },
+                  franchise: {
+                    connect: {
+                      id: franchise.id,
+                    },
+                  },
                   features: {
                     connect: {
                       id: feature.id,
@@ -748,6 +871,8 @@ describe("When removing games from a feature", () => {
                   },
                 },
               });
+
+              // END_REVISION_3
 
               // Act
               const result = await adminCaller.feature.removeGames({
