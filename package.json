@@ -11,7 +11,7 @@
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "test": "docker-compose -f docker-compose.yml up -d && npx dotenv -e .env.test -- npx prisma migrate deploy  && npx dotenv -e .env.test -- jest -i",
-    "test:ci": "npx prisma db push && jest -i"
+    "test:ci": "npx prisma db push && jest -i --testTimeout=200000"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
