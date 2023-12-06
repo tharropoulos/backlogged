@@ -67,3 +67,7 @@ export function handlePrismaError(err: unknown): Err<TRPCError> {
     );
   }
 }
+
+export type Omit<T, U extends keyof T> = {
+  [P in Exclude<keyof T, U>]: T[P];
+};
