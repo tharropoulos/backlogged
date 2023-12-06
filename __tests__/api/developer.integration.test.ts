@@ -738,7 +738,7 @@ describe("When removing games from a developer", () => {
                   name: faker.lorem.words(),
                   backgroundImage: faker.image.url(),
                   coverImage: faker.image.url(),
-                  description: faker.lorem.paragraph(),
+                  description: faker.lorem.words(),
                   releaseDate: faker.date.past(),
                   // publisherId: publisher.id,
                   // franchiseId: franchise.id,
