@@ -61,6 +61,7 @@ model CommentLike {
     userId    String
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    @@unique([commentId, userId])
     @@index([commentId])
     @@index([userId])
 }
