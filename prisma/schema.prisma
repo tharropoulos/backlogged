@@ -47,6 +47,7 @@ model ReviewLike {
     userId    String
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    @@unique([reviewId, userId])
     @@index([reviewId])
     @@index([userId])
 }
