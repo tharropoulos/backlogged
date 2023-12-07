@@ -66,7 +66,7 @@ describe("When creating a publisher", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -81,7 +81,7 @@ describe("When creating a publisher", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
   });
@@ -197,7 +197,7 @@ describe("When updating a publisher", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -213,7 +213,7 @@ describe("When updating a publisher", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -269,7 +269,7 @@ describe("When deleting a publisher", () => {
       const result = unauthenticatedCaller.publisher.delete({ id: createId() });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
   describe("and the user is authenticated", () => {
@@ -281,7 +281,7 @@ describe("When deleting a publisher", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 

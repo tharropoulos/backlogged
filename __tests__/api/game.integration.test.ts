@@ -115,7 +115,7 @@ describe("When creating a game", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -134,7 +134,7 @@ describe("When creating a game", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -157,7 +157,7 @@ describe("When creating a game", () => {
 
           // Assert
           // REWRITE_1: Return a result.ok instead of throwing an error
-          //   await expect(result).rejects.toThrowError();
+          //   await expect(result).rejects.toThrow();
           expect(result.ok).toBe(false);
         });
       });
@@ -180,7 +180,7 @@ describe("When creating a game", () => {
 
           // Assert
           // REWRITE_1: Return a result.ok instead of throwing an error
-          //   await expect(result).rejects.toThrowError();
+          //   await expect(result).rejects.toThrow();
           expect(result.ok).toBe(false);
         });
       });
@@ -318,7 +318,7 @@ describe("When updating a game", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
   });
@@ -339,7 +339,7 @@ describe("When updating a game", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -402,7 +402,7 @@ describe("When deleting a game", () => {
       const result = unauthenticatedCaller.game.delete({ id: createId() });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -415,7 +415,7 @@ describe("When deleting a game", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 

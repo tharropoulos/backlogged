@@ -15,6 +15,7 @@ afterAll(async () => {
   const franchises = prisma.franchise.deleteMany();
   const publishers = prisma.publisher.deleteMany();
   const gameToPlatform = prisma.gameToPlatform.deleteMany();
+  const users = prisma.user.deleteMany();
   const games = prisma.game.deleteMany();
   await prisma.$transaction([
     platforms,
@@ -22,6 +23,7 @@ afterAll(async () => {
     publishers,
     gameToPlatform,
     games,
+    users,
   ]);
 });
 
@@ -77,7 +79,7 @@ describe("When creating a platform", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -92,7 +94,7 @@ describe("When creating a platform", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -209,7 +211,7 @@ describe("When updating a platform", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -225,7 +227,7 @@ describe("When updating a platform", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -285,7 +287,7 @@ describe("When deleting a platform", () => {
       const result = unauthenticatedCaller.platform.delete({ id: createId() });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -298,7 +300,7 @@ describe("When deleting a platform", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 

@@ -70,7 +70,7 @@ describe("When creating a feature", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -85,7 +85,7 @@ describe("When creating a feature", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -202,7 +202,7 @@ describe("When updating a feature", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -218,7 +218,7 @@ describe("When updating a feature", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -278,7 +278,7 @@ describe("When deleting a feature", () => {
       const result = unauthenticatedCaller.feature.delete({ id: createId() });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -291,7 +291,7 @@ describe("When deleting a feature", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -530,7 +530,7 @@ describe("When adding games to a feature", () => {
           });
 
           // Assert
-          await expect(result).rejects.toThrowError();
+          await expect(result).rejects.toThrow();
         });
       });
 
@@ -548,7 +548,7 @@ describe("When adding games to a feature", () => {
             });
 
             // Assert
-            await expect(result).rejects.toThrowError();
+            await expect(result).rejects.toThrow();
           });
         });
         describe("and the user is an admin", () => {
@@ -684,7 +684,7 @@ describe("When removing games from a feature", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -704,7 +704,7 @@ describe("When removing games from a feature", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
         // END_NON_COPILOT_CODE
         // BEGIN_COPILOT_CODE
       });

@@ -69,7 +69,7 @@ describe("When creating a genre", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -83,7 +83,7 @@ describe("When creating a genre", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -195,7 +195,7 @@ describe("When updating a genre", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -210,7 +210,7 @@ describe("When updating a genre", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -268,7 +268,7 @@ describe("When deleting a genre", () => {
       const result = unauthenticatedCaller.genre.delete({ id: createId() });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -281,7 +281,7 @@ describe("When deleting a genre", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -474,7 +474,7 @@ describe("When adding games to a genre", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
   describe("and the user is authenticated", () => {
@@ -491,7 +491,7 @@ describe("When adding games to a genre", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
     describe("and the user is an admin", () => {
@@ -642,7 +642,7 @@ describe("When removing games from a genre", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
   describe("and the user is authenticated", () => {
@@ -659,7 +659,7 @@ describe("When removing games from a genre", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
     describe("and the user is an admin", () => {

@@ -68,7 +68,7 @@ describe("When creating a developer", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -83,7 +83,7 @@ describe("When creating a developer", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -200,7 +200,7 @@ describe("When updating a developer", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -216,7 +216,7 @@ describe("When updating a developer", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -237,7 +237,7 @@ describe("When updating a developer", () => {
 
           // Assert
           // REWRITE_3: use result.ok instead of throwErr
-          //   await expect(result).rejects.toThrowError();
+          //   await expect(result).rejects.toThrow();
           expect(result.ok).toBe(false);
           expect(result.err).toBeTruthy();
         });
@@ -280,7 +280,7 @@ describe("When deleting a developer", () => {
       const result = unauthenticatedCaller.developer.delete({ id: createId() });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
 
@@ -293,7 +293,7 @@ describe("When deleting a developer", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
 
@@ -648,7 +648,7 @@ describe("When removing games from a developer", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
     describe("and the user is an admin", () => {

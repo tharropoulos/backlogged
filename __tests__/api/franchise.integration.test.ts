@@ -66,7 +66,7 @@ describe("When creating a franchise", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
   describe("and the user is authenticated", () => {
@@ -80,7 +80,7 @@ describe("When creating a franchise", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
     describe("and the user is an admin", () => {
@@ -201,7 +201,7 @@ describe("When updating a franchise", () => {
       });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
   describe("and the user is authenticated", () => {
@@ -216,7 +216,7 @@ describe("When updating a franchise", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
     describe("and the user is an admin", () => {
@@ -271,7 +271,7 @@ describe("When deleting a franchise", () => {
       const result = unauthenticatedCaller.franchise.delete({ id: createId() });
 
       // Assert
-      await expect(result).rejects.toThrowError();
+      await expect(result).rejects.toThrow();
     });
   });
   describe("and the user is authenticated", () => {
@@ -283,7 +283,7 @@ describe("When deleting a franchise", () => {
         });
 
         // Assert
-        await expect(result).rejects.toThrowError();
+        await expect(result).rejects.toThrow();
       });
     });
     describe("and the user is an admin", () => {
