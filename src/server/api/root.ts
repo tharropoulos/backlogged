@@ -8,6 +8,7 @@ import { platformRouter } from "./routers/platform";
 import { gameRouter } from "./routers/game";
 import { reviewRouter } from "./routers/review";
 import { commentRouter } from "./routers/comment";
+import { playlistRouter } from "./routers/playlist";
 
 /**
  * This is the primary router for your server.
@@ -23,6 +24,7 @@ export const appRouter = createTRPCRouter({
   platform: platformRouter,
   game: gameRouter,
   review: reviewRouter,
+  playlist: playlistRouter,
   comment: commentRouter,
 });
 
