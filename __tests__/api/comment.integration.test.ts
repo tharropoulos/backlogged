@@ -75,7 +75,7 @@ beforeAll(async () => {
 
   const review = await prisma.review.create({
     data: {
-      content: faker.lorem.paragraph(),
+      content: faker.lorem.words(),
       rating: 5,
       game: {
         connect: {
@@ -194,7 +194,7 @@ describe("When creating a review", () => {
       // Act
       const result = unauthenticatedCaller.comment.create({
         reviewId: reviewId,
-        content: faker.lorem.paragraph(),
+        content: faker.lorem.words(),
       });
 
       // Assert
@@ -208,7 +208,7 @@ describe("When creating a review", () => {
         // Arrange
         const comment: z.infer<typeof createCommentSchema> = {
           reviewId: createId(), // This ID does not exist
-          content: faker.lorem.paragraph(),
+          content: faker.lorem.words(),
         };
 
         // Act
@@ -224,7 +224,7 @@ describe("When creating a review", () => {
         // Arrange
         const comment: z.infer<typeof createCommentSchema> = {
           reviewId: reviewId,
-          content: faker.lorem.paragraph(),
+          content: faker.lorem.words(),
         };
 
         // Act
@@ -256,7 +256,7 @@ describe("When retrieving a comment by Id", () => {
       // Arrange
       const comment: Comment = await prisma.comment.create({
         data: {
-          content: faker.lorem.paragraph(),
+          content: faker.lorem.words(),
           reviewId: reviewId,
           userId: mockUser.id,
         },
@@ -278,7 +278,7 @@ describe("When retrieving a comment by Id", () => {
       // Arrange
       const comment: Comment = await prisma.comment.create({
         data: {
-          content: faker.lorem.paragraph(),
+          content: faker.lorem.words(),
           reviewId: reviewId,
           userId: mockUser.id,
           deleted: new Date(),
@@ -319,7 +319,7 @@ describe("When retrieving all comments", () => {
       // Arrange
       const comments: Array<Omit<Comment, "id">> = [
         {
-          content: faker.lorem.paragraph(),
+          content: faker.lorem.words(),
           // REWRITE_1: add createdAt and updatedAt and parentId
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -329,7 +329,7 @@ describe("When retrieving all comments", () => {
           deleted: null,
         },
         {
-          content: faker.lorem.paragraph(),
+          content: faker.lorem.words(),
           reviewId: reviewId,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -360,7 +360,7 @@ describe("When retrieving all comments", () => {
 
       const comments: Array<Omit<Comment, "id">> = [
         {
-          content: faker.lorem.paragraph(),
+          content: faker.lorem.words(),
           reviewId: reviewId,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -369,7 +369,7 @@ describe("When retrieving all comments", () => {
           deleted: null,
         },
         {
-          content: faker.lorem.paragraph(),
+          content: faker.lorem.words(),
           reviewId: reviewId,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -399,7 +399,7 @@ describe("When updating a comment", () => {
       // Act
       const result = unauthenticatedCaller.comment.update({
         id: createId(),
-        content: faker.lorem.paragraph(),
+        content: faker.lorem.words(),
       });
 
       // Assert
@@ -413,7 +413,7 @@ describe("When updating a comment", () => {
         // Act
         const result = await authenticatedCaller.comment.update({
           id: createId(),
-          content: faker.lorem.paragraph(),
+          content: faker.lorem.words(),
         });
 
         // Assert
@@ -427,7 +427,7 @@ describe("When updating a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
@@ -437,7 +437,7 @@ describe("When updating a comment", () => {
           // Act
           const result = await otherAuthenticatedCaller.comment.update({
             id: comment.id,
-            content: faker.lorem.paragraph(),
+            content: faker.lorem.words(),
           });
 
           // Assert
@@ -450,14 +450,14 @@ describe("When updating a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
             },
           });
 
-          const updatedContent = faker.lorem.paragraph();
+          const updatedContent = faker.lorem.words();
 
           // Act
           const result = await adminCaller.comment.update({
@@ -476,14 +476,14 @@ describe("When updating a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
             },
           });
 
-          const updatedContent = faker.lorem.paragraph();
+          const updatedContent = faker.lorem.words();
 
           // Act
           const result = await authenticatedCaller.comment.update({
@@ -502,14 +502,14 @@ describe("When updating a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: new Date(),
             },
           });
 
-          const updatedContent = faker.lorem.paragraph();
+          const updatedContent = faker.lorem.words();
 
           // Act
           const result = await authenticatedCaller.comment.update({
@@ -557,7 +557,7 @@ describe("When deleting a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
@@ -579,7 +579,7 @@ describe("When deleting a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: new Date(),
@@ -601,7 +601,7 @@ describe("When deleting a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
@@ -627,7 +627,7 @@ describe("When deleting a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
@@ -683,7 +683,7 @@ describe("When liking a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: new Date(),
@@ -705,7 +705,7 @@ describe("When liking a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
@@ -731,7 +731,7 @@ describe("When liking a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
@@ -786,7 +786,7 @@ describe("When unliking a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
@@ -808,7 +808,7 @@ describe("When unliking a comment", () => {
           // Arrange
           const comment: Comment = await prisma.comment.create({
             data: {
-              content: faker.lorem.paragraph(),
+              content: faker.lorem.words(),
               reviewId: reviewId,
               userId: mockUser.id,
               deleted: null,
@@ -857,7 +857,7 @@ describe("When retrieving the details of a comment", () => {
         // Arrange
         const comment: Comment = await prisma.comment.create({
           data: {
-            content: faker.lorem.paragraph(),
+            content: faker.lorem.words(),
             reviewId: reviewId,
             userId: mockUser.id,
             deleted: new Date(),
@@ -879,7 +879,7 @@ describe("When retrieving the details of a comment", () => {
         // Arrange
         const parentComment: Comment = await prisma.comment.create({
           data: {
-            content: faker.lorem.paragraph(),
+            content: faker.lorem.words(),
             reviewId: reviewId,
             userId: mockUser.id,
             deleted: null,
@@ -888,7 +888,7 @@ describe("When retrieving the details of a comment", () => {
 
         const childComment: Comment = await prisma.comment.create({
           data: {
-            content: faker.lorem.paragraph(),
+            content: faker.lorem.words(),
             reviewId: reviewId,
             userId: mockUser.id,
             deleted: null,
