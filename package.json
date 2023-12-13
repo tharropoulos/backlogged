@@ -10,7 +10,7 @@
     "start": "next start",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "test": "docker-compose -f docker-compose.yml up -d && npx dotenv -e .env.test -- npx prisma migrate deploy  && npx dotenv -e .env.test -- jest -i",
+    "test": "docker-compose -f docker-compose.yml up -d && npx dotenv -e .env.test -- npx prisma db push  && npx dotenv -e .env.test -- jest -i",
     "test:ci": "npx prisma db push && jest -i --testTimeout=200000"
   },
   "dependencies": {
@@ -83,7 +83,7 @@
     "tailwindcss": "^3.3.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.3.3"
   },
   "ct3aMetadata": {
     "initVersion": "7.15.0"
