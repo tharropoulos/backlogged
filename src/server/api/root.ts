@@ -9,6 +9,7 @@ import { gameRouter } from "./routers/game";
 import { reviewRouter } from "./routers/review";
 import { commentRouter } from "./routers/comment";
 import { playlistRouter } from "./routers/playlist";
+import { chatRouter } from "./routers/chat";
 
 /**
  * This is the primary router for your server.
@@ -26,6 +27,7 @@ export const appRouter = createTRPCRouter({
   review: reviewRouter,
   playlist: playlistRouter,
   comment: commentRouter,
+  chat: chatRouter,
 });
 
 // export type definition of API
