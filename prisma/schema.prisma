@@ -16,6 +16,51 @@ datasource db {
     url               = env("DATABASE_URL")
 }
 
+enum ChatType {
+    BACKEND
+    FRONTEND
+    TESTING
+    LANGUAGE
+    OTHER
+}
+
+model CopilotFiles {
+    id                   String   @id @default(cuid())
+    path                 String   @db.VarChar(191)
+    createdAt            DateTime @default(now())
+    rewrites             Int
+    manual_rewrites      Int
+    revisions            Int
+    manual_code_intances Int
+    subject              String   @db.VarChar(191)
+}
+
+model Chat {
+    id          Int           @id @default(autoincrement())
+    prompt      String        @db.LongText()
+    response    String?       @db.LongText()
+    failed      Boolean?      @default(false)
+    createdAt   DateTime      @default(now())
+    canceled    Boolean?      @default(false)
+    rating      Int?
+    type        ChatType      @default(BACKEND)
+    subject     String?
+    contextUsed ContextUsed[]
+}
+
+model ContextUsed {
+    id              String @id @default(cuid())
+    startLineNumber Int
+    endLineNumber   Int
+    startColumn     Int
+    endColumn       Int
+    path            String
+    chatId          Int
+    chat            Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+    @@index([chatId])
+}
+
 model Game {
     id              String           @id @default(cuid())
     name            String           @db.VarChar(191)
@@ -32,7 +77,7 @@ model Game {
     platforms       GameToPlatform[]
     features        Feature[]
     reviews         Review[]
-    playlists       Playlist[]
+    playlists       GameToPlaylist[]
 
     @@index([publisherId])
     @@index([franchiseId])
@@ -136,6 +181,7 @@ model GameToPlatform {
     platform   Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
     storeLink  String   @map("store_link") @db.VarChar(191)
 
+    // @@unique([])
     @@index([gameId])
     @@index([platformId])
 }
@@ -224,15 +270,28 @@ model Playlist {
     type        PlaylistType
     userId      String
     user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-    games       Game[]
     createdAt   DateTime           @default(now())
     updatedAt   DateTime           @updatedAt
-    deletedAt   DateTime?
-    deleted     Boolean            @default(false)
+    deleted     DateTime?
     visibility  PlaylistVisibility
     likes       PlaylistLike[]
+    games       GameToPlaylist[]
 
     @@index([userId])
+}
+
+model GameToPlaylist {
+    gameId     String
+    game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+    order      Int      @default(0)
+    addedAt    DateTime @default(now())
+    playlistId String
+    playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+
+    @@id([gameId, playlistId])
+    @@index([gameId])
+    @@index([playlistId])
+    @@index([order])
 }
 
 model PlaylistLike {
@@ -244,6 +303,7 @@ model PlaylistLike {
     userId     String
     user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    @@unique([playlistId, userId])
     @@index([playlistId])
     @@index([userId])
 }
