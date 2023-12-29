@@ -456,7 +456,7 @@ describe("When getting all playlists", () => {
 
         // Assert
         expect(result.ok).toBe(true);
-        //END_COPILOT_CODE
+        // END_COPILOT_CODE
 
         // BEGIN_NON_COPILOT_CODE
         // especially wrong
@@ -1723,4 +1723,37 @@ describe("When updating the order of games in a playlist", () => {
     });
   });
 });
-//END_NON_COPILOT_CODE
+
+// test("source", async () => {
+//   const data = fs.readFileSync(path.join(__dirname, "../../new.json"), "utf-8");
+//   type Chat = {
+//     prompt: string;
+//     response: string;
+//     errorDetails: null | string;
+//     isCanceled: boolean;
+//     vote: null | number;
+//     contentReferences: {
+//       path: string;
+//       startLineNumber: number;
+//       startColumn: number;
+//       endLineNumber: number;
+//       endColumn: number;
+//     }[];
+//   };
+//
+//   const routersPath = path.join(__dirname, "../../src/server/api/routers");
+//   const testsPath = path.join(__dirname, "../api");
+//
+//   const test = await authenticatedCaller.chat.sourceFiles({
+//     directoryPath: routersPath,
+//   });
+//   const test2 = await authenticatedCaller.chat.sourceFiles({
+//     directoryPath: testsPath,
+//   });
+//   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+//   const chats: Chat[] = JSON.parse(data);
+//   const validatedChats = jsonSchema.parse(chats);
+//
+//   const result = await authenticatedCaller.chat.sourceChat(validatedChats);
+// });
+// END_NON_COPILOT_CODE
