@@ -1,22 +1,29 @@
 /* eslint-disable testing-library/no-await-sync-query */
+/* eslint-disable @typescript-eslint/unbound-method */
+//__BEGIN_COPILOT_CODE
+// Import necessary modules and types
 import { appRouter } from "~/server/api/root";
 import { createMockContext, type MockContext } from "~/server/api/context";
 import type { Session, User } from "next-auth";
 import { faker } from "@faker-js/faker";
 import { createId } from "@paralleldrive/cuid2";
 import { type z } from "zod";
-import { type createFranchiseSchema } from "~/lib/validations/franchise";
-import { Prisma, type Franchise } from "@prisma/client";
+import { type createPublisherSchema } from "~/lib/validations/publisher";
+import { Prisma, type Publisher } from "@prisma/client";
 
+// Initialize mock context
 let mockCtx: MockContext;
 
+// Reset mock context before each test
 beforeEach(() => {
   mockCtx = createMockContext();
 });
+
+// Clear all mocks after each test
 afterEach(() => {
   jest.clearAllMocks();
 });
-
+// Create mock users
 const mockUser: User = {
   role: "User",
   id: createId(),
@@ -29,6 +36,7 @@ const mockAdmin: User = {
   name: faker.person.firstName(),
 };
 
+// Create mock sessions
 const mockUserSession: Session = {
   expires: new Date().toISOString(),
   user: mockUser,
@@ -38,8 +46,7 @@ const mockAdminSession: Session = {
   expires: new Date().toISOString(),
   user: mockAdmin,
 };
-
-describe("When creating a franchise", () => {
+describe("When creating a publisher", () => {
   describe("and the user is not authenticated", () => {
     it("should throw an error", async () => {
       // Arrange
@@ -50,8 +57,10 @@ describe("When creating a franchise", () => {
 
       // Act + Expect
       await expect(() =>
-        caller.franchise.create({
+        caller.publisher.create({
           name: faker.company.name(),
+          // __REWRITE_1: image: imageUrl() is deprecated, use url() instead
+          //   image: faker.image.imageUrl(),
           image: faker.image.url(),
           description: faker.lorem.words(),
         })
@@ -69,7 +78,7 @@ describe("When creating a franchise", () => {
 
         // Act + Expect
         await expect(() =>
-          caller.franchise.create({
+          caller.publisher.create({
             name: faker.company.name(),
             image: faker.image.url(),
             description: faker.lorem.words(),
@@ -77,15 +86,16 @@ describe("When creating a franchise", () => {
         ).rejects.toThrow();
       });
     });
+
     describe("and the user is an admin", () => {
-      it("should create the franchise", async () => {
+      it("should create a publisher", async () => {
         // Arrange
         const caller = appRouter.createCaller({
           prisma: mockCtx.prisma,
           session: mockAdminSession,
         });
 
-        const expectedCreated: z.infer<typeof createFranchiseSchema> & {
+        const expectedCreated: z.infer<typeof createPublisherSchema> & {
           id: string;
         } = {
           name: faker.company.name(),
@@ -93,31 +103,39 @@ describe("When creating a franchise", () => {
           image: faker.image.url(),
           description: faker.lorem.words(),
         };
-        mockCtx.prisma.franchise.create.mockResolvedValue(expectedCreated);
+
+        mockCtx.prisma.publisher.create.mockResolvedValue(expectedCreated);
 
         // Act
-        const result = await caller.franchise.create(expectedCreated);
+        const result = await caller.publisher.create(expectedCreated);
 
         // Assert
         expect(result.ok).toBe(true);
         // eslint-disable-next-line @typescript-eslint/unbound-method
-        expect(mockCtx.prisma.franchise.create).toHaveBeenCalledWith({
+        expect(mockCtx.prisma.publisher.create).toHaveBeenCalledWith({
           data: {
             name: expectedCreated.name,
             description: expectedCreated.description,
             image: expectedCreated.image,
           },
         });
+        //__REWRITE_3: use createPublisherSchema instead of Publisher
+        // Arrange
+        // const newPublisher: Publisher = {
+        //   name: faker.company.name(),
+        //   image: faker.image.url(),
+        //   description: faker.lorem.words(),
+        // };
       });
     });
   });
 });
 
-describe("When retrieving all franchises", () => {
-  describe("and there are no franchises", () => {
+describe("When retrieving all publishers", () => {
+  describe("and there are no publishers", () => {
     it("should return an empty array", async () => {
       // Arrange
-      mockCtx.prisma.franchise.findMany.mockResolvedValue([]);
+      mockCtx.prisma.publisher.findMany.mockResolvedValue([]);
 
       const caller = appRouter.createCaller({
         prisma: mockCtx.prisma,
@@ -125,19 +143,19 @@ describe("When retrieving all franchises", () => {
       });
 
       // Act
-      const result = await caller.franchise.getAll();
+      const result = await caller.publisher.getAll();
 
       // Assert
       expect(result.ok).toBe(true);
       expect(result.val).toMatchObject([]);
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(mockCtx.prisma.franchise.findMany).toHaveBeenCalledWith();
+      expect(mockCtx.prisma.publisher.findMany).toHaveBeenCalledWith();
     });
   });
-  describe("and there are franchises", () => {
-    it("should return the franchises", async () => {
+
+  describe("and there are publishers", () => {
+    it("should return the publishers", async () => {
       // Arrange
-      const franchises: Array<Franchise> = [
+      const publishers: Array<Publisher> = [
         {
           id: createId(),
           name: faker.company.name(),
@@ -152,7 +170,7 @@ describe("When retrieving all franchises", () => {
         },
       ];
 
-      mockCtx.prisma.franchise.findMany.mockResolvedValue(franchises);
+      mockCtx.prisma.publisher.findMany.mockResolvedValue(publishers);
 
       const caller = appRouter.createCaller({
         prisma: mockCtx.prisma,
@@ -160,27 +178,27 @@ describe("When retrieving all franchises", () => {
       });
 
       // Act
-      const result = await caller.franchise.getAll();
+      const result = await caller.publisher.getAll();
 
       // Assert
       expect(result.ok).toBe(true);
-      expect(result.val).toMatchObject(franchises);
+      expect(result.val).toMatchObject(publishers);
     });
   });
 });
 
-describe("When retrieving a franchise by Id", () => {
-  describe("and the franchise does not exist", () => {
+describe("When retrieving a publisher by Id", () => {
+  describe("and the publisher does not exist", () => {
     it("should return an error", async () => {
       // Arrange
-      mockCtx.prisma.franchise.findUnique.mockResolvedValue(null);
+      mockCtx.prisma.publisher.findUnique.mockResolvedValue(null);
 
       const caller = appRouter.createCaller({
         prisma: mockCtx.prisma,
         session: null,
       });
 
-      const result = await caller.franchise.getById({
+      const result = await caller.publisher.getById({
         id: createId(),
       });
 
@@ -188,17 +206,18 @@ describe("When retrieving a franchise by Id", () => {
       expect(result.ok).toBe(false);
     });
   });
-  describe("and the franchise exists", () => {
-    it("should return the franchise", async () => {
+
+  describe("and the publisher exists", () => {
+    it("should return the publisher", async () => {
       // Arrange
-      const franchise: Franchise = {
+      const publisher: Publisher = {
         name: faker.company.name(),
         id: createId(),
         image: faker.image.url(),
         description: faker.lorem.words(),
       };
 
-      mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
+      mockCtx.prisma.publisher.findUnique.mockResolvedValue(publisher);
 
       const caller = appRouter.createCaller({
         prisma: mockCtx.prisma,
@@ -206,22 +225,21 @@ describe("When retrieving a franchise by Id", () => {
       });
 
       // Act
-      const result = await caller.franchise.getById({ id: franchise.id });
+      const result = await caller.publisher.getById({ id: publisher.id });
 
       // Assert
       expect(result.ok).toBe(true);
-      expect(result.val).toMatchObject(franchise);
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(mockCtx.prisma.franchise.findUnique).toHaveBeenCalledWith({
+      expect(result.val).toMatchObject(publisher);
+      expect(mockCtx.prisma.publisher.findUnique).toHaveBeenCalledWith({
         where: {
-          id: franchise.id,
+          id: publisher.id,
         },
       });
     });
   });
 });
 
-describe("When updating a franchise", () => {
+describe("When updating a publisher", () => {
   describe("and the user is not authenticated", () => {
     it("should throw an error", async () => {
       // Arrange
@@ -232,7 +250,7 @@ describe("When updating a franchise", () => {
 
       // Act + Expect
       await expect(() =>
-        caller.franchise.update({
+        caller.publisher.update({
           name: faker.company.name(),
           id: createId(),
           image: faker.image.url(),
@@ -253,7 +271,7 @@ describe("When updating a franchise", () => {
 
         // Act + Expect
         await expect(() =>
-          caller.franchise.update({
+          caller.publisher.update({
             name: faker.company.name(),
             id: createId(),
             image: faker.image.url(),
@@ -262,11 +280,12 @@ describe("When updating a franchise", () => {
         ).rejects.toThrow();
       });
     });
+
     describe("and the user is an admin", () => {
-      describe("and the franchise does not exist", () => {
+      describe("and the publisher does not exist", () => {
         it("should return an error", async () => {
           // Arrange
-          mockCtx.prisma.franchise.update.mockRejectedValue(
+          mockCtx.prisma.publisher.update.mockRejectedValue(
             new Prisma.PrismaClientKnownRequestError("Record Not Found", {
               code: "P2025",
               clientVersion: "2.30.0",
@@ -279,7 +298,7 @@ describe("When updating a franchise", () => {
           });
 
           //Act
-          const result = await caller.franchise.update({
+          const result = await caller.publisher.update({
             name: faker.company.name(),
             id: createId(),
             image: faker.image.url(),
@@ -290,26 +309,27 @@ describe("When updating a franchise", () => {
           expect(result.ok).toBe(false);
         });
       });
-      describe("and the franchise exists", () => {
-        it("should update the franchise", async () => {
+
+      describe("and the publisher exists", () => {
+        it("should update the publisher", async () => {
           // Arrange
-          const franchise: Franchise = {
+          const publisher: Publisher = {
             name: faker.company.name(),
             id: createId(),
             image: faker.image.url(),
             description: faker.lorem.words(),
           };
 
-          mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
+          mockCtx.prisma.publisher.findUnique.mockResolvedValue(publisher);
 
-          const expectedUpdated: Franchise = {
-            id: franchise.id,
+          const expectedUpdated: Publisher = {
+            id: publisher.id,
             name: faker.company.name(),
             image: faker.image.url(),
             description: faker.lorem.words(),
           };
 
-          mockCtx.prisma.franchise.update.mockResolvedValue(expectedUpdated);
+          mockCtx.prisma.publisher.update.mockResolvedValue(expectedUpdated);
 
           const caller = appRouter.createCaller({
             prisma: mockCtx.prisma,
@@ -317,21 +337,20 @@ describe("When updating a franchise", () => {
           });
 
           // Act
-          const result = await caller.franchise.update(expectedUpdated);
+          const result = await caller.publisher.update(expectedUpdated);
 
           // Assert
           expect(result.ok).toBe(true);
           expect(result.val).toMatchObject(expectedUpdated);
-          // eslint-disable-next-line @typescript-eslint/unbound-method
-          expect(mockCtx.prisma.franchise.update).toHaveBeenCalledWith({
+          expect(mockCtx.prisma.publisher.update).toHaveBeenCalledWith({
             data: {
               name: expectedUpdated.name,
+              description: expectedUpdated.description,
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               image: expectedUpdated.image,
-              description: expectedUpdated.description,
             },
             where: {
-              id: franchise.id,
+              id: publisher.id,
             },
           });
         });
@@ -340,7 +359,8 @@ describe("When updating a franchise", () => {
   });
 });
 
-describe("When deleting a franchise", () => {
+//__BEGIN_COPILOT_CODE
+describe("When deleting a publisher", () => {
   describe("and the user is not authenticated", () => {
     it("should throw an error", async () => {
       // Arrange
@@ -351,7 +371,7 @@ describe("When deleting a franchise", () => {
 
       // Act + Expect
       await expect(() =>
-        caller.franchise.delete({
+        caller.publisher.delete({
           id: createId(),
         })
       ).rejects.toThrow();
@@ -368,19 +388,17 @@ describe("When deleting a franchise", () => {
 
         // Act + Expect
         await expect(() =>
-          caller.franchise.delete({
+          caller.publisher.delete({
             id: createId(),
           })
         ).rejects.toThrow();
       });
     });
     describe("and the user is an admin", () => {
-      describe("and the franchise does not exist", () => {
+      describe("and the publisher does not exist", () => {
         it("should return an error", async () => {
           // Arrange
-          // mockCtx.prisma.franchise.findUnique.mockResolvedValue(null);
-
-          mockCtx.prisma.franchise.delete.mockRejectedValue(
+          mockCtx.prisma.publisher.delete.mockRejectedValue(
             new Prisma.PrismaClientKnownRequestError("Record Not Found", {
               code: "P2025",
               clientVersion: "2.30.0",
@@ -393,7 +411,7 @@ describe("When deleting a franchise", () => {
           });
 
           // Act
-          const result = await caller.franchise.delete({
+          const result = await caller.publisher.delete({
             id: createId(),
           });
 
@@ -402,26 +420,26 @@ describe("When deleting a franchise", () => {
         });
       });
 
-      describe("and the franchise exists", () => {
-        it("should delete the franchise", async () => {
+      describe("and the publisher exists", () => {
+        it("should delete the publisher", async () => {
           // Arrange
-          const franchise: Franchise = {
+          const publisher: Publisher = {
             id: createId(),
             name: faker.company.name(),
             image: faker.image.url(),
             description: faker.lorem.words(),
           };
 
-          mockCtx.prisma.franchise.findUnique.mockResolvedValue(franchise);
+          mockCtx.prisma.publisher.findUnique.mockResolvedValue(publisher);
 
-          const expectedDeleted: Franchise = {
+          const expectedDeleted: Publisher = {
             id: createId(),
             name: faker.company.name(),
             image: faker.image.url(),
             description: faker.lorem.words(),
           };
 
-          mockCtx.prisma.franchise.delete.mockResolvedValue(expectedDeleted);
+          mockCtx.prisma.publisher.delete.mockResolvedValue(expectedDeleted);
 
           const caller = appRouter.createCaller({
             prisma: mockCtx.prisma,
@@ -429,17 +447,16 @@ describe("When deleting a franchise", () => {
           });
 
           // Act
-          const result = await caller.franchise.delete({
-            id: franchise.id,
+          const result = await caller.publisher.delete({
+            id: publisher.id,
           });
 
           // Assert
           expect(result.ok).toBe(true);
           expect(result.val).toMatchObject(expectedDeleted);
-          // eslint-disable-next-line @typescript-eslint/unbound-method
-          expect(mockCtx.prisma.franchise.delete).toHaveBeenCalledWith({
+          expect(mockCtx.prisma.publisher.delete).toHaveBeenCalledWith({
             where: {
-              id: franchise.id,
+              id: publisher.id,
             },
           });
         });
@@ -447,3 +464,4 @@ describe("When deleting a franchise", () => {
     });
   });
 });
+//__END_COPILOT_CODE

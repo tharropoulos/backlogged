@@ -1,3 +1,4 @@
+// BEGIN_COPILOT_CODE
 /* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable testing-library/no-await-sync-query */
 import type { Session } from "next-auth";
@@ -6,13 +7,13 @@ import { appRouter } from "~/server/api/root";
 import { prisma } from "~/server/db";
 import { faker } from "@faker-js/faker";
 import { createId } from "@paralleldrive/cuid2";
-import { type Franchise } from "@prisma/client";
+import { type Publisher } from "@prisma/client";
 import { type z } from "zod";
-import { type createFranchiseSchema } from "~/lib/validations/franchise";
+import { type createPublisherSchema } from "~/lib/validations/publisher";
 
 afterAll(async () => {
-  const franchises = prisma.franchise.deleteMany();
-  await prisma.$transaction([franchises]);
+  const publishers = prisma.publisher.deleteMany();
+  await prisma.$transaction([publishers]);
 });
 
 const mockUser: User = {
@@ -39,7 +40,6 @@ const mockAdminSession: Session = {
   expires: new Date().toISOString(),
   user: mockAdmin,
 };
-
 const authenticatedCaller = appRouter.createCaller({
   session: mockSession,
   prisma: prisma,
@@ -54,12 +54,12 @@ const adminCaller = appRouter.createCaller({
   session: mockAdminSession,
   prisma: prisma,
 });
-
-describe("When creating a franchise", () => {
+// END_COPILOT_CODE
+describe("When creating a publisher", () => {
   describe("and the user is not authenticated", () => {
     it("should throw an error", async () => {
       // Act
-      const result = unauthenticatedCaller.franchise.create({
+      const result = unauthenticatedCaller.publisher.create({
         name: faker.company.name(),
         description: faker.company.catchPhrase(),
         image: faker.image.url(),
@@ -69,11 +69,12 @@ describe("When creating a franchise", () => {
       await expect(result).rejects.toThrow();
     });
   });
+
   describe("and the user is authenticated", () => {
     describe("and the user is not an admin", () => {
       it("should throw an error", async () => {
         // Act
-        const result = authenticatedCaller.franchise.create({
+        const result = authenticatedCaller.publisher.create({
           name: faker.company.name(),
           description: faker.company.catchPhrase(),
           image: faker.image.url(),
@@ -83,31 +84,32 @@ describe("When creating a franchise", () => {
         await expect(result).rejects.toThrow();
       });
     });
-    describe("and the user is an admin", () => {
-      it("should create a franchise", async () => {
-        // Arrange
-        const franchise: z.infer<typeof createFranchiseSchema> = {
-          name: faker.company.name(),
-          description: faker.company.catchPhrase(),
-          image: faker.image.url(),
-        };
+  });
 
-        // Act
-        const result = await adminCaller.franchise.create(franchise);
+  describe("and the user is an admin", () => {
+    it("should create a publisher", async () => {
+      // Arrange
+      const publisher: z.infer<typeof createPublisherSchema> = {
+        name: faker.company.name(),
+        description: faker.company.catchPhrase(),
+        image: faker.image.url(),
+      };
 
-        // Assert
-        expect(result.ok).toBe(true);
-        expect(result.val).toMatchObject(franchise);
-      });
+      // Act
+      const result = await adminCaller.publisher.create(publisher);
+
+      // Assert
+      expect(result.ok).toBe(true);
+      expect(result.val).toMatchObject(publisher);
     });
   });
 });
 
-describe("When retrieving a franchise by Id", () => {
-  describe("and the franchise does not exist", () => {
+describe("When retrieving a publisher by Id", () => {
+  describe("and the publisher does not exist", () => {
     it("should return an error", async () => {
       // Act
-      const result = await unauthenticatedCaller.franchise.getById({
+      const result = await unauthenticatedCaller.publisher.getById({
         id: createId(),
       });
 
@@ -116,10 +118,10 @@ describe("When retrieving a franchise by Id", () => {
     });
   });
 
-  describe("and the franchise exists", () => {
-    it("should return a franchise", async () => {
+  describe("and the publisher exists", () => {
+    it("should return a publisher", async () => {
       // Arrange
-      const data = await prisma.franchise.create({
+      const data = await prisma.publisher.create({
         data: {
           image: faker.image.url(),
           description: faker.company.catchPhrase(),
@@ -128,7 +130,7 @@ describe("When retrieving a franchise by Id", () => {
       });
 
       // Act
-      const result = await authenticatedCaller.franchise.getById({
+      const result = await authenticatedCaller.publisher.getById({
         id: data.id,
       });
 
@@ -139,25 +141,24 @@ describe("When retrieving a franchise by Id", () => {
   });
 });
 
-describe("When retrieving all franchises", () => {
-  describe("and there are no franchises", () => {
+describe("When retrieving all publishers", () => {
+  describe("and there are no publishers", () => {
     it("should return an empty array", async () => {
       // Arrange
-      await prisma.franchise.deleteMany();
+      await prisma.publisher.deleteMany();
 
       // Act
-      const result = await authenticatedCaller.franchise.getAll();
+      const result = await authenticatedCaller.publisher.getAll();
 
       // Assert
       expect(result.ok).toBe(true);
       expect(result.val).toMatchObject([]);
     });
   });
-
-  describe("and there are franchises", () => {
-    it("should return an array of franchises", async () => {
+  describe("and there are publishers", () => {
+    it("should return an array of publishers", async () => {
       // Arrange
-      const franchises = [
+      const publishers = [
         {
           name: faker.company.name(),
           description: faker.company.catchPhrase(),
@@ -170,17 +171,12 @@ describe("When retrieving all franchises", () => {
         },
       ];
 
-      await prisma.franchise.createMany({
-        data: franchises,
-      });
-
-      const caller = appRouter.createCaller({
-        session: null,
-        prisma: prisma,
+      await prisma.publisher.createMany({
+        data: publishers,
       });
 
       // Act
-      const result = await caller.franchise.getAll();
+      const result = await authenticatedCaller.publisher.getAll();
 
       // Assert
       expect(result.ok).toBe(true);
@@ -189,11 +185,11 @@ describe("When retrieving all franchises", () => {
   });
 });
 
-describe("When updating a franchise", () => {
+describe("When updating a publisher", () => {
   describe("and the user is not authenticated", () => {
     it("should throw an error", async () => {
       // Act
-      const result = unauthenticatedCaller.franchise.update({
+      const result = unauthenticatedCaller.publisher.update({
         id: createId(),
         name: faker.company.name(),
         description: faker.company.catchPhrase(),
@@ -204,11 +200,12 @@ describe("When updating a franchise", () => {
       await expect(result).rejects.toThrow();
     });
   });
+
   describe("and the user is authenticated", () => {
     describe("and the user is not an admin", () => {
       it("should throw an error", async () => {
         // Act
-        const result = authenticatedCaller.franchise.update({
+        const result = authenticatedCaller.publisher.update({
           id: createId(),
           name: faker.company.name(),
           description: faker.company.catchPhrase(),
@@ -219,11 +216,12 @@ describe("When updating a franchise", () => {
         await expect(result).rejects.toThrow();
       });
     });
+
     describe("and the user is an admin", () => {
-      describe("and the franchise does not exist", () => {
+      describe("and the publisher does not exist", () => {
         it("should return an error", async () => {
           // Act
-          const result = await adminCaller.franchise.update({
+          const result = await adminCaller.publisher.update({
             id: createId(),
             name: faker.company.name(),
             description: faker.company.catchPhrase(),
@@ -234,10 +232,10 @@ describe("When updating a franchise", () => {
           expect(result.ok).toBe(false);
         });
       });
-      describe("and the franchise exists", () => {
-        it("should update the franchise", async () => {
+      describe("and the publisher exists", () => {
+        it("should update the publisher", async () => {
           // Arrange
-          const data = await prisma.franchise.create({
+          const data = await prisma.publisher.create({
             data: {
               name: faker.company.name(),
               description: faker.company.catchPhrase(),
@@ -245,7 +243,7 @@ describe("When updating a franchise", () => {
             },
           });
 
-          const expected: Franchise = {
+          const expected = {
             id: data.id,
             name: faker.company.name(),
             description: faker.company.catchPhrase(),
@@ -253,7 +251,7 @@ describe("When updating a franchise", () => {
           };
 
           // Act
-          const result = await adminCaller.franchise.update(expected);
+          const result = await adminCaller.publisher.update(expected);
 
           // Assert
           expect(result.ok).toBe(true);
@@ -264,11 +262,11 @@ describe("When updating a franchise", () => {
   });
 });
 
-describe("When deleting a franchise", () => {
+describe("When deleting a publisher", () => {
   describe("and the user is not authenticated", () => {
     it("should throw an error", async () => {
       // Act
-      const result = unauthenticatedCaller.franchise.delete({ id: createId() });
+      const result = unauthenticatedCaller.publisher.delete({ id: createId() });
 
       // Assert
       await expect(result).rejects.toThrow();
@@ -278,7 +276,7 @@ describe("When deleting a franchise", () => {
     describe("and the user is not an admin", () => {
       it("should throw an error", async () => {
         // Act
-        const result = authenticatedCaller.franchise.delete({
+        const result = authenticatedCaller.publisher.delete({
           id: createId(),
         });
 
@@ -286,11 +284,12 @@ describe("When deleting a franchise", () => {
         await expect(result).rejects.toThrow();
       });
     });
+
     describe("and the user is an admin", () => {
-      describe("and the franchise does not exist", () => {
+      describe("and the publisher does not exist", () => {
         it("should return an error", async () => {
           // Act
-          const result = await adminCaller.franchise.delete({
+          const result = await adminCaller.publisher.delete({
             id: createId(),
           });
 
@@ -298,10 +297,11 @@ describe("When deleting a franchise", () => {
           expect(result.ok).toBe(false);
         });
       });
-      describe("and the franchise exists", () => {
-        it("should delete the franchise", async () => {
+
+      describe("and the publisher exists", () => {
+        it("should delete the publisher", async () => {
           // Arrange
-          const data = await prisma.franchise.create({
+          const data = await prisma.publisher.create({
             data: {
               name: faker.company.name(),
               description: faker.company.catchPhrase(),
@@ -310,7 +310,7 @@ describe("When deleting a franchise", () => {
           });
 
           // Act
-          const result = await adminCaller.franchise.delete({
+          const result = await adminCaller.publisher.delete({
             id: data.id,
           });
 
@@ -322,3 +322,4 @@ describe("When deleting a franchise", () => {
     });
   });
 });
+// END_COPILOT_CODE

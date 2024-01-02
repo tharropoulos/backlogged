@@ -100,13 +100,10 @@ export function CreateFranchiseForm() {
         <FormItem className="w-full">
           <FormLabel>Image</FormLabel>
           <FormControl>
-            <Input
-              {...form.register("backgroundImage")}
-              placeholder="Franchise Image"
-            />
+            <Input {...form.register("image")} placeholder="Franchise Image" />
           </FormControl>
           <UncontrolledFormMessage
-            message={form.formState.errors.backgroundImage?.message}
+            message={form.formState.errors.image?.message}
           />
         </FormItem>
         <div className="flex gap-5">

@@ -1,3 +1,4 @@
+//__BEGIN_COPILOT_CODE
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
@@ -7,20 +8,20 @@ import {
 } from "~/server/api/trpc";
 
 import {
-  createFranchiseSchema,
-  updateFranchiseSchema,
-} from "~/lib/validations/franchise";
-import { type Franchise } from "@prisma/client";
+  createPublisherSchema,
+  updatePublisherSchema,
+} from "~/lib/validations/publisher"; // Make sure to create these validations
+import { type Publisher } from "@prisma/client";
 import { type Result, Ok, Err } from "ts-results";
 import { handlePrismaError } from "~/utils";
 
-export const franchiseRouter = createTRPCRouter({
+export const publisherRouter = createTRPCRouter({
   getAll: publicProcedure.query(
-    async ({ ctx }): Promise<Result<Array<Franchise>, TRPCError>> => {
+    async ({ ctx }): Promise<Result<Array<Publisher>, TRPCError>> => {
       const result: Result<
-        Array<Franchise>,
+        Array<Publisher>,
         TRPCError
-      > = await ctx.prisma.franchise
+      > = await ctx.prisma.publisher
         .findMany()
         .then((res) => Ok(res), handlePrismaError);
 
@@ -30,8 +31,8 @@ export const franchiseRouter = createTRPCRouter({
 
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
-      const result: Result<Franchise, TRPCError> = await ctx.prisma.franchise
+    .query(async ({ ctx, input }): Promise<Result<Publisher, TRPCError>> => {
+      const result: Result<Publisher, TRPCError> = await ctx.prisma.publisher
         .findUnique({
           where: {
             id: input.id,
@@ -43,7 +44,7 @@ export const franchiseRouter = createTRPCRouter({
             : new Err(
                 new TRPCError({
                   code: "NOT_FOUND",
-                  message: "Franchise not found",
+                  message: "Publisher not found",
                 })
               );
         }, handlePrismaError);
@@ -53,8 +54,8 @@ export const franchiseRouter = createTRPCRouter({
 
   delete: adminProcedure
     .input(z.object({ id: z.string() }))
-    .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
-      const result: Result<Franchise, TRPCError> = await ctx.prisma.franchise
+    .mutation(async ({ ctx, input }): Promise<Result<Publisher, TRPCError>> => {
+      const result: Result<Publisher, TRPCError> = await ctx.prisma.publisher
         .delete({
           where: { id: input.id },
         })
@@ -64,25 +65,25 @@ export const franchiseRouter = createTRPCRouter({
     }),
 
   create: adminProcedure
-    .input(createFranchiseSchema)
-    .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
-      const franchise: Result<Franchise, TRPCError> = await ctx.prisma.franchise
+    .input(createPublisherSchema)
+    .mutation(async ({ ctx, input }): Promise<Result<Publisher, TRPCError>> => {
+      const publisher: Result<Publisher, TRPCError> = await ctx.prisma.publisher
         .create({
           data: {
             name: input.name,
-            description: input.description,
             image: input.image,
+            description: input.description,
           },
         })
         .then((res) => Ok(res), handlePrismaError);
 
-      return franchise;
+      return publisher;
     }),
 
   update: adminProcedure
-    .input(updateFranchiseSchema)
-    .mutation(async ({ ctx, input }): Promise<Result<Franchise, TRPCError>> => {
-      const result: Result<Franchise, TRPCError> = await ctx.prisma.franchise
+    .input(updatePublisherSchema)
+    .mutation(async ({ ctx, input }): Promise<Result<Publisher, TRPCError>> => {
+      const result: Result<Publisher, TRPCError> = await ctx.prisma.publisher
         .update({
           where: {
             id: input.id,
@@ -94,6 +95,8 @@ export const franchiseRouter = createTRPCRouter({
           },
         })
         .then((res) => Ok(res), handlePrismaError);
+
       return result;
     }),
 });
+//__END_COPILOT_CODE
