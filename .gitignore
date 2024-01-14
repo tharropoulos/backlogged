@@ -5,10 +5,11 @@
 /.pnp
 .pnp.js
 .vscode
+.react-email
 
 /mysql
 
-./src/components/emails/previews/
+src/components/email/previews/
 
 # testing
 /coverage
