@@ -5,10 +5,17 @@ import {
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
+import EmailProvider from "next-auth/providers/email";
 import DiscordProvider from "next-auth/providers/discord";
 import GithubProvider from "next-auth/providers/github";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
+import { Resend } from "resend";
+import { SignInEmail } from "~/components/email/sign-in-email";
+import Error from "next/error";
+import SignUpEmail from "~/components/email/sign-up-email";
+
+const resend = new Resend(process.env.RESEND_KEY);
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -48,7 +55,84 @@ export const authOptions: NextAuthOptions = {
     },
   },
   adapter: PrismaAdapter(prisma),
+  pages: {
+    signIn: "/auth/signin",
+  },
   providers: [
+    EmailProvider({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: process.env.EMAIL_SERVER_PORT,
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
+        },
+      },
+      from: process.env.EMAIL_FROM,
+      sendVerificationRequest: async ({ identifier, url, provider }) => {
+        const host = new URL(url);
+        const escapedHost = host.protocol + "//" + host.hostname;
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: identifier,
+          },
+          select: {
+            name: true,
+            image: true,
+            emailVerified: true,
+          },
+        });
+        if (user?.emailVerified) {
+          try {
+            const { data, error } = await resend.emails.send({
+              from: process.env.EMAIL_FROM ?? "",
+              to: identifier,
+              subject: "Sign in",
+              react: SignInEmail({
+                imageUrl: user?.image ?? undefined,
+                email: identifier,
+                host: escapedHost,
+                url: url,
+                username: user?.name ?? undefined,
+              }),
+            });
+
+            console.log(data);
+
+            if (error) {
+              console.log(error);
+              throw new Error({ statusCode: 500, title: error.message });
+            }
+            return;
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        try {
+          const { data, error } = await resend.emails.send({
+            from: process.env.EMAIL_FROM ?? "",
+            to: identifier,
+            subject: "Sign Up",
+            react: SignUpEmail({
+              email: identifier,
+              host: escapedHost,
+              url: url,
+            }),
+          });
+
+          console.log(data);
+
+          if (error) {
+            console.log(error);
+            throw new Error({ statusCode: 500, title: error.message });
+          }
+        } catch (error) {
+          console.log(error);
+          throw new Error({ statusCode: 500, title: "Something went wrong." });
+        }
+      },
+    }),
     GithubProvider({
       id: "github",
       clientId: env.GITHUB_ID,
